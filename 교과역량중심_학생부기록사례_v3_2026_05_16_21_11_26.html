@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>교과 역량 관점으로 보는 학생부 기록 사례</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#1c2b4a;--gold:#b8892a;--gold2:#d4aa55;
+  --cream:#f7f5f0;--cream2:#ede9e1;--white:#fff;--text:#222;--muted:#555;--border:#ddd8ce;
+  --r1:#b07c0a;--r2:#5e5e5e;--r3:#9e5f30;
+  --c1:#2e5fa3;--c2:#1e7a47;--c3:#8b2252;--c4:#c45208;--c5:#1a6fa3;
+  --c6:#6a3e15;--c7:#7a2a8a;--c9a:#8a2222;--c9b:#5a1a6a;--c9c:#1a5a2a;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;font-size:15px;}
+
+/* HEADER */
+.hdr{background:var(--navy);padding:0 26px;display:flex;align-items:center;height:68px;gap:16px;position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(0,0,0,.3);}
+.hdr-title{font-family:'Noto Sans KR',sans-serif;color:#fff;font-size:1.9rem;font-weight:700;letter-spacing:-.5px;white-space:nowrap;}
+.hdr-author{color:var(--gold2);font-size:1rem;margin-left:auto;white-space:nowrap;}
+
+/* LAYOUT */
+.layout{display:grid;grid-template-columns:210px 1fr 250px;height:calc(100vh - 68px);overflow:hidden;}
+
+/* SIDENAV */
+.sidenav{background:var(--navy);overflow-y:auto;padding:14px 0 40px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.15) transparent;}
+.nsec{font-size:.9rem;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,.3);text-transform:uppercase;padding:14px 16px 4px;}
+.nbtn{display:flex;align-items:center;gap:9px;padding:10px 16px;cursor:pointer;color:rgba(255,255,255,.6);font-size:1.13rem;font-weight:500;transition:all .13s;position:relative;border:none;background:none;width:100%;text-align:left;}
+.nbtn:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.9);}
+.nbtn.active{color:#fff;background:rgba(255,255,255,.11);}
+.nbtn.active::before{content:'';position:absolute;left:0;top:4px;bottom:4px;width:3px;border-radius:0 2px 2px 0;background:var(--cc,var(--gold2));}
+.ndot{width:9px;height:9px;border-radius:50%;flex-shrink:0;opacity:.5;}
+.nbtn.active .ndot{opacity:1;}
+.nsub{padding-left:28px;font-size:1.05rem;}
+
+/* MAIN */
+.main{overflow-y:auto;padding:22px 20px 50px;scrollbar-width:thin;}
+.cat-hdr{display:flex;align-items:center;gap:12px;margin-bottom:18px;padding-bottom:13px;border-bottom:2px solid var(--border);}
+.cat-badge{padding:5px 16px;border-radius:20px;color:#fff;font-size:1.05rem;font-weight:700;letter-spacing:.5px;}
+.cat-name{font-family:'Noto Serif KR',serif;font-size:1.6rem;font-weight:700;color:var(--navy);}
+.etabs{display:flex;gap:7px;margin-bottom:14px;flex-wrap:wrap;}
+.etab{padding:7px 15px;border-radius:20px;border:1.5px solid var(--border);background:var(--white);color:var(--muted);font-size:1.05rem;font-weight:600;cursor:pointer;transition:all .13s;font-family:'Noto Sans KR',sans-serif;}
+.etab:hover{border-color:var(--cc,var(--navy));color:var(--cc,var(--navy));}
+.etab.active{background:var(--cc,var(--navy));border-color:var(--cc,var(--navy));color:#fff;}
+
+/* RECORD CARD */
+.rec{background:var(--white);border-radius:10px;box-shadow:0 2px 14px rgba(0,0,0,.08);overflow:hidden;}
+.rec-meta{padding:12px 20px 10px;border-bottom:1px solid var(--cream2);display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.m-sub{font-size:.88rem;font-weight:700;letter-spacing:.4px;padding:3px 10px;border-radius:8px;color:#fff;}
+.m-type{font-size:.82rem;color:var(--muted);background:var(--cream);border-radius:7px;padding:3px 9px;}
+.rec-body{padding:20px 22px 16px;font-family:'Noto Serif KR',serif;font-size:.93rem;line-height:2.0;color:#2a2a2a;letter-spacing:-.2px;}
+
+/* HIGHLIGHT SPANS */
+.h1{background:rgba(176,124,10,.15);color:var(--r1);font-weight:600;border-radius:3px;padding:0 2px;border-bottom:2px solid rgba(176,124,10,.4);transition:background .25s;}
+.h2{background:rgba(94,94,94,.11);color:var(--r2);font-weight:600;border-radius:3px;padding:0 2px;border-bottom:2px solid rgba(94,94,94,.3);transition:background .25s;}
+.h3{background:rgba(158,95,48,.12);color:var(--r3);font-weight:600;border-radius:3px;padding:0 2px;border-bottom:2px solid rgba(158,95,48,.3);transition:background .25s;}
+.h1.glow{background:rgba(176,124,10,.38);}
+.h2.glow{background:rgba(94,94,94,.3);}
+.h3.glow{background:rgba(158,95,48,.32);}
+
+/* ANALYSIS SECTION — below record */
+.rec-analysis{border-top:1px solid var(--cream2);padding:16px 20px 18px;background:#faf9f5;}
+.ra-hdr{font-size:1rem;font-weight:700;letter-spacing:.6px;color:var(--navy);margin-bottom:12px;}
+.ra-rows{display:flex;flex-direction:column;gap:9px;}
+.ra-row{display:flex;align-items:flex-start;gap:11px;cursor:pointer;padding:10px 12px;border-radius:8px;border:1.5px solid var(--border);background:var(--white);transition:box-shadow .15s,transform .12s;}
+.ra-row:hover{box-shadow:0 3px 10px rgba(0,0,0,.11);transform:translateX(3px);}
+.ra-bdg{flex-shrink:0;width:56px;padding:3px 0;text-align:center;border-radius:14px;font-size:.8rem;font-weight:800;color:#fff;}
+.rb1{background:var(--r1);}.rb2{background:var(--r2);}.rb3{background:var(--r3);}
+.ra-info{flex:1;}
+.ra-top{display:flex;align-items:center;gap:8px;margin-bottom:5px;}
+.ra-name{font-size:.95rem;font-weight:700;}
+.rn1{color:var(--r1);}.rn2{color:var(--r2);}.rn3{color:var(--r3);}
+.ra-pct{font-size:.78rem;color:var(--muted);margin-left:auto;}
+.ra-bar{width:100%;height:5px;background:#e5e0d8;border-radius:3px;margin:5px 0;}
+.ra-fill{height:100%;border-radius:3px;}
+.rf1{background:var(--r1);}.rf2{background:var(--r2);}.rf3{background:var(--r3);}
+.ra-desc{font-size:.82rem;color:var(--muted);line-height:1.6;}
+.ra-hint{font-size:.72rem;color:#bbb;margin-top:9px;text-align:right;}
+
+/* COMPETENCY INTRO TAB */
+.comp-intro{background:var(--white);border-radius:10px;box-shadow:0 2px 14px rgba(0,0,0,.08);padding:24px 26px;}
+.ci-title{font-family:'Noto Serif KR',serif;font-size:1.3rem;font-weight:700;color:var(--navy);margin-bottom:6px;}
+.ci-sub{font-size:.92rem;color:var(--muted);margin-bottom:18px;line-height:1.7;}
+.comp-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.chip{padding:11px 14px;border-radius:8px;border-left:4px solid;background:var(--cream);}
+.chip-num{font-size:.73rem;font-weight:700;letter-spacing:.8px;margin-bottom:4px;opacity:.7;}
+.chip-name{font-size:.97rem;font-weight:700;line-height:1.3;margin-bottom:4px;}
+.chip-desc{font-size:.8rem;color:var(--muted);line-height:1.55;}
+.src-note{margin-top:14px;font-size:.78rem;color:var(--muted);border-top:1px solid var(--border);padding-top:10px;line-height:1.7;}
+
+/* RIGHT PANEL */
+.rp{background:var(--cream2);border-left:1px solid var(--border);overflow-y:auto;padding:20px 15px 32px;scrollbar-width:thin;}
+.rp-h{font-size:.92rem;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--navy);margin-bottom:13px;padding-bottom:8px;border-bottom:2px solid var(--navy);}
+.lbox{background:var(--white);border-radius:7px;padding:13px 15px;}
+.lrow{display:flex;align-items:center;gap:9px;margin-bottom:7px;font-size:.92rem;color:#333;}
+.ldot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.rp-note{font-size:.82rem;color:var(--muted);margin-top:16px;line-height:1.8;text-align:center;padding:13px;background:var(--white);border-radius:7px;}
+
+.fade-in{animation:fi .2s ease;}
+@keyframes fi{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+
+@media(max-width:1050px){.layout{grid-template-columns:195px 1fr}.rp{display:none}}
+@media(max-width:720px){
+  .layout{grid-template-columns:1fr;grid-template-rows:auto 1fr}
+  .sidenav{height:auto;display:flex;flex-wrap:wrap;padding:8px;gap:5px}
+  .nbtn{width:auto;border-radius:20px;padding:5px 11px;font-size:.9rem}
+  .nsec{display:none}.nbtn.active::before{display:none}
+  .comp-grid{grid-template-columns:1fr}
+  .hdr-title{font-size:1.2rem}
+}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-title">교과 역량 관점으로 보는 학생부 기록 사례</div>
+  <div class="hdr-author">✍ 화원고등학교 진로진학상담교사 박한민</div>
+</header>
+<div class="layout">
+<nav class="sidenav">
+  <div class="nsec">교과 세특</div>
+  <button class="nbtn active" data-cat="korean" style="--cc:var(--c1)" onclick="sw('korean',this)"><span class="ndot" style="background:var(--c1)"></span>국어과</button>
+  <button class="nbtn" data-cat="math" style="--cc:var(--c2)" onclick="sw('math',this)"><span class="ndot" style="background:var(--c2)"></span>수학과</button>
+  <button class="nbtn" data-cat="english" style="--cc:var(--c3)" onclick="sw('english',this)"><span class="ndot" style="background:var(--c3)"></span>영어과</button>
+  <button class="nbtn" data-cat="social" style="--cc:var(--c4)" onclick="sw('social',this)"><span class="ndot" style="background:var(--c4)"></span>사회과</button>
+  <button class="nbtn" data-cat="science" style="--cc:var(--c5)" onclick="sw('science',this)"><span class="ndot" style="background:var(--c5)"></span>과학과</button>
+  <button class="nbtn" data-cat="history" style="--cc:var(--c6)" onclick="sw('history',this)"><span class="ndot" style="background:var(--c6)"></span>한국사</button>
+  <button class="nbtn" data-cat="arts" style="--cc:var(--c7)" onclick="sw('arts',this)"><span class="ndot" style="background:var(--c7)"></span>예체능·교양</button>
+  <div class="nsec" style="margin-top:6px">창의적 체험활동</div>
+  <button class="nbtn nsub" data-cat="auto" style="--cc:var(--c9a)" onclick="sw('auto',this)"><span class="ndot" style="background:var(--c9a)"></span>자율활동</button>
+  <button class="nbtn nsub" data-cat="career" style="--cc:var(--c9b)" onclick="sw('career',this)"><span class="ndot" style="background:var(--c9b)"></span>진로활동</button>
+  <button class="nbtn nsub" data-cat="club" style="--cc:var(--c9c)" onclick="sw('club',this)"><span class="ndot" style="background:var(--c9c)"></span>동아리활동</button>
+</nav>
+<main class="main" id="mc"></main>
+<aside class="rp">
+  <div class="rp-h">총론 6대 핵심역량</div>
+  <div class="lbox">
+    <div class="lrow"><span class="ldot" style="background:#e67e22"></span>자기관리 역량</div>
+    <div class="lrow"><span class="ldot" style="background:#2980b9"></span>지식정보처리 역량</div>
+    <div class="lrow"><span class="ldot" style="background:#8e44ad"></span>창의적 사고 역량</div>
+    <div class="lrow"><span class="ldot" style="background:#c0392b"></span>심미적 감성 역량</div>
+    <div class="lrow"><span class="ldot" style="background:#16a085"></span>협력적 소통 역량</div>
+    <div class="lrow"><span class="ldot" style="background:#27ae60"></span>공동체 역량</div>
+  </div>
+  <div class="rp-note">아래 역량 카드를 클릭하면 해당 서술 구간으로 이동합니다 👆<br><br><b style="color:var(--r1)">1위</b> · <b style="color:var(--r2)">2위</b> · <b style="color:var(--r3)">3위</b> 색상으로 역량을 확인하세요</div>
+</aside>
+</div>
+
+<script>
+
+// ═══════════════════════════════════════════
+// DATA — 실제 합격생 기록 사례
+// ═══════════════════════════════════════════
+const COMPS = {
+  korean:{
+    label:'국어과 교과 역량',
+    items:[
+      {id:'a',name:'비판적·창의적 사고 역량',desc:'글을 비판적으로 이해하고 독창적 관점에서 창의적으로 표현·사고하는 역량'},
+      {id:'b',name:'의사소통 역량',desc:'다양한 상황에서 언어를 통해 생각과 정보를 적절하게 표현·이해하는 역량'},
+      {id:'c',name:'문화 향유 역량',desc:'문학·예술·매체 등 다양한 문화를 감상·참여·향유하는 역량'},
+      {id:'d',name:'디지털·미디어 역량',desc:'디지털 환경에서 정보를 비판적으로 읽고 책임감 있게 소통하는 역량'},
+      {id:'e',name:'자기 성찰·계발 역량',desc:'언어생활을 성찰하고 자기를 계발하며 삶의 의미를 탐구하는 역량'},
+      {id:'f',name:'공동체·대인관계 역량',desc:'공동체의 일원으로서 타인을 배려하고 협력하며 소통하는 역량'},
+    ]
+  },
+  math:{
+    label:'수학과 교과 역량',
+    items:[
+      {id:'a',name:'문제해결 역량',desc:'수학적 개념과 원리를 적용하여 다양한 문제를 해결하는 역량'},
+      {id:'b',name:'추론 역량',desc:'수학적 사실을 논리적으로 탐구하고 타당성을 검증하는 역량'},
+      {id:'c',name:'연결 역량',desc:'수학의 내적 개념 간 및 다른 교과와 실생활을 연결하는 역량'},
+      {id:'d',name:'의사소통 역량',desc:'수학적 아이디어를 다양한 표현 방법으로 설명하고 공유하는 역량'},
+      {id:'e',name:'정보처리 역량',desc:'데이터를 수집·분석하고 수학적 도구를 활용하는 역량'},
+    ]
+  },
+  english:{
+    label:'영어과 교과 역량',
+    items:[
+      {id:'a',name:'영어 의사소통 역량',desc:'영어로 다양한 상황에서 효과적으로 의사소통하는 역량'},
+      {id:'b',name:'지식정보처리 역량',desc:'영어를 활용하여 정보를 수집·분석하고 활용하는 역량'},
+      {id:'c',name:'자기관리 역량',desc:'자기주도적으로 영어를 학습하고 활용하는 역량'},
+      {id:'d',name:'공동체 역량',desc:'영어로 공동체와 소통하며 협력하고 기여하는 역량'},
+    ]
+  },
+  social:{
+    label:'사회과 교과 역량',
+    items:[
+      {id:'a',name:'창의적 사고력',desc:'사회 현상을 새로운 관점에서 창의적으로 탐구하는 역량'},
+      {id:'b',name:'비판적 사고력',desc:'사회 현상과 정보를 논리적·비판적으로 분석하는 역량'},
+      {id:'c',name:'문제해결력 및 의사결정력',desc:'사회 문제를 분석하고 합리적 해결 방안을 도출하는 역량'},
+      {id:'d',name:'의사소통 및 협업 능력',desc:'사회적 쟁점에 대해 소통하고 협력하여 문제를 해결하는 역량'},
+      {id:'e',name:'정보 활용 능력',desc:'사회 현상 탐구에 필요한 정보를 수집·분석·활용하는 역량'},
+      {id:'f',name:'공동체적 역량',desc:'공동체의 일원으로서 책임감 있게 참여하고 기여하는 역량'},
+    ]
+  },
+  science:{
+    label:'과학과 교과 역량',
+    items:[
+      {id:'a',name:'과학적 사고력',desc:'과학 지식을 논리적·비판적·창의적으로 사고하는 역량'},
+      {id:'b',name:'과학적 탐구 능력',desc:'과학적 방법으로 현상을 탐구하고 문제를 해결하는 역량'},
+      {id:'c',name:'과학적 문제해결력',desc:'과학 지식을 활용하여 실생활 문제를 해결하는 역량'},
+      {id:'d',name:'과학적 의사소통 능력',desc:'과학 탐구 과정 및 결과를 다양한 방식으로 소통하는 역량'},
+      {id:'e',name:'과학적 참여와 평생학습 능력',desc:'과학 관련 사회적 문제에 관심을 갖고 평생 학습하는 역량'},
+    ]
+  },
+  history:{
+    label:'한국사 교과 역량',
+    items:[
+      {id:'a',name:'역사 사실 이해',desc:'시간적·공간적 맥락 속에서 역사 사실을 이해하는 역량'},
+      {id:'b',name:'역사 자료 분석과 해석',desc:'다양한 역사 자료를 비판적으로 분석하고 해석하는 역량'},
+      {id:'c',name:'역사적 판단력과 문제해결능력',desc:'역사 지식을 바탕으로 현재의 문제를 탐구하고 해결하는 역량'},
+      {id:'d',name:'역사 정보 활용 및 의사소통',desc:'역사 지식을 활용하여 적절하게 표현하고 소통하는 역량'},
+      {id:'e',name:'정체성과 상호 존중',desc:'다양한 관점에서 역사를 이해하고 타자를 존중하는 역량'},
+    ]
+  },
+  auto:{
+    label:'창의적 체험활동 (자율) — 핵심역량',
+    items:[
+      {id:'a',name:'자기관리 역량',desc:'자기 이해를 바탕으로 목표를 설정하고 자기주도적으로 활동하는 역량'},
+      {id:'b',name:'지식정보처리 역량',desc:'다양한 자료를 수집·분석하여 활동 목적에 맞게 활용하는 역량'},
+      {id:'c',name:'창의적 사고 역량',desc:'새로운 아이디어로 문제를 재정의하고 독창적으로 해결하는 역량'},
+      {id:'d',name:'심미적 감성 역량',desc:'예술적 감수성과 공감 능력으로 활동 경험을 표현하는 역량'},
+      {id:'e',name:'협력적 소통 역량',desc:'다양한 구성원과 협력하여 공동의 목표를 달성하는 역량'},
+      {id:'f',name:'공동체 역량',desc:'학교 공동체의 일원으로서 책임감 있게 참여하고 기여하는 역량'},
+    ]
+  },
+  career:{
+    label:'창의적 체험활동 (진로) — 핵심역량',
+    items:[
+      {id:'a',name:'자기관리 역량',desc:'진로 목표를 설정하고 지속적으로 자기를 계발하는 역량'},
+      {id:'b',name:'지식정보처리 역량',desc:'진로 탐구 과정에서 정보를 수집·분석하여 활용하는 역량'},
+      {id:'c',name:'창의적 사고 역량',desc:'진로 분야에서 창의적으로 문제를 정의하고 탐구하는 역량'},
+      {id:'d',name:'심미적 감성 역량',desc:'진로 체험과 탐구에서 공감과 감수성을 발휘하는 역량'},
+      {id:'e',name:'협력적 소통 역량',desc:'진로 활동에서 타인과 협력하고 소통하는 역량'},
+      {id:'f',name:'공동체 역량',desc:'진로 목표를 사회적 기여와 연결하여 실천하는 역량'},
+    ]
+  },
+  club:{
+    label:'창의적 체험활동 (동아리) — 핵심역량',
+    items:[
+      {id:'a',name:'자기관리 역량',desc:'동아리 목표를 설정하고 계획적으로 활동을 지속하는 역량'},
+      {id:'b',name:'지식정보처리 역량',desc:'동아리 주제 관련 자료를 탐색·분석하여 활동에 활용하는 역량'},
+      {id:'c',name:'창의적 사고 역량',desc:'동아리 활동에서 새로운 아이디어를 제안하고 실현하는 역량'},
+      {id:'d',name:'심미적 감성 역량',desc:'동아리 활동 경험에서 감수성과 심미적 안목을 발휘하는 역량'},
+      {id:'e',name:'협력적 소통 역량',desc:'동아리 구성원과 협력하며 공동의 목표를 달성하는 역량'},
+      {id:'f',name:'공동체 역량',desc:'동아리 활동을 통해 학교와 사회에 기여하는 역량'},
+    ]
+  }
+};
+
+const DATA = {
+  korean:{
+    label:'국어과',color:'var(--c1)',
+    items:[
+      {
+        no:0,tab:'교과역량',subject:'',type:'',
+        isComp:true
+      },
+      {
+        no:1,tab:'사례 1',subject:'공통국어1',type:'세부능력 및 특기사항',
+        text:`수업 시간에 현대시 '광야(이육사)'를 배우면서 이육사의 의식 세계에 공감하게 되어 더 깊게 알아보고자 탐구 활동을 진행하고 그 결과물을 제출하는 <span class="h1" data-rank="1">확장적 학습 능력을 발휘함</span>. '이육사 시 연구(임월남)', '이육사 시집(이육사)', '이육사 시의 의식과 그 의미(김병택)' 등을 참고하여 진행한 탐구를 통해 이육사의 한국 문학사적 의의, 전기적 사실, 특히 독립 운동 과정과 문학 활동 과정을 살펴보면서 둘 사이의 관계에 대해 고찰함. 이육사의 시에 드러난 전체적인 분위기와 어조에 대해서 알아보았고, 시집의 작품들을 직접 분석하면서 이육사의 시 세계를 꼼꼼하게 파악하는 치밀함을 보여 줌. <span class="h2" data-rank="2">이 과정에서 원형 상징을 통해서 민족의 독립 의지를 잘 드러내었고 대부분의 시들이 비슷한 래퍼토리를 통해서 전개되어 상당한 통일성을 띠고 있다는 사실을 알아내는 분석력도 보여 줌</span>. 수업 내용을 확실히 이해하기 위해 추가 학습도 심도 있게 하는 등 <span class="h3" data-rank="3">아주 세심하고 치밀한 학습력과 탐구적 역량을 지닌 학생임</span>.`,
+        comps:[
+          {r:1,name:'비판적·창의적 사고 역량',desc:'3편의 참고문헌을 종합하여 이육사 시 세계를 독자적으로 탐구·분석',pct:50},
+          {r:2,name:'문화 향유 역량',desc:'시 작품을 직접 분석하며 원형 상징과 통일성을 스스로 발견하는 감상 역량',pct:30},
+          {r:3,name:'자기 성찰·계발 역량',desc:'수업 범위를 넘어 자발적으로 심화 학습하는 자기주도 학습 태도',pct:20}
+        ]
+      },
+      {
+        no:2,tab:'사례 2',subject:'공통국어2 · 화법과 작문',type:'세부능력 및 특기사항',
+        text:`(1학기) 국어 모든 영역의 분석력이 매우 뛰어나고 성실하고 적극적인 학생임. '무기력의 비밀(김현수)'을 읽고 서평을 작성함. '학습된 무기력'이 학업성취도에 미치는 영향에 대해 알아보고 싶어 자료를 찾아 봄. <span class="h3" data-rank="3">그 과정에서 '실패 내성'이라는 용어를 알게 되었는데 본 자료에서는 '실패 내성'이 '학습된 무기력'보다 학업성취를 더 잘 예언하는 변인으로 나타났다는 결론을 내린 것을 보고 '실패내성'과 '무기력'에 대한 차이점을 정리하여 발표함</span>. (2학기) 논제를 분석하고 쟁점을 구성하여 논증하며 토론하는 실력이 탁월함. 반대신문식 정책 토론에서 모둠장을 맡아 이견을 조정하고 협력하도록 함. '정시 비중 50% 확대해야 한다'를 논제로 제안하고 찬성측 반박을 맡아 설득력 있게 논증함. <span class="h1" data-rank="1">필수쟁점으로 정시는 입시의 공정성을 확보하고 선발의 객관적 지표가 된다고 언급하며 근거로 입시비리 보도 기사와 입시 통계 분석자료를 제시해 논리의 타당성을 높임</span>. 토론실습과정에서 <span class="h2" data-rank="2">예리한 반대신문으로 상대측의 논리를 반박함</span>. 이후 '능력주의와 불평등(박권일 외)'을 읽고 입시경쟁 위주의 교육을 비판하고 특정한 조건이 충족될 때만 능력주의의 정당성을 인정할 필요가 있다는 롤스의 주장에 공감한다는 내용의 독서활동 보고서를 작성함.`,
+        comps:[
+          {r:1,name:'의사소통 역량',desc:'통계 자료를 근거로 논리의 타당성을 높이며 설득력 있게 논증하는 토론 역량',pct:50},
+          {r:2,name:'비판적·창의적 사고 역량',desc:'예리한 반대신문으로 상대 논리의 허점을 포착하는 비판적 사고',pct:30},
+          {r:3,name:'자기 성찰·계발 역량',desc:'독서를 통해 능력주의와 교육의 관계를 자신의 관점으로 성찰하는 역량',pct:20}
+        ]
+      },
+      {
+        no:3,tab:'사례 3',subject:'화법과 언어',type:'세부능력 및 특기사항',
+        text:`어순 배열, 품사 체계 등에서 한국어가 일본어와 유사한 점이 많다고 느꼈던 경험을 바탕으로 '한국어가 일본어와 서로 언어적 영향을 주고 받았다'라는 가설을 세우고 증명해보는 활동을 수행함. '고향의 봄(이원수)'에서 '나의 살던 고향은'이라는 구절이 현대 국어에서 틀린 문장이지만 이렇게 표현된 이유에 대해 일제강점기를 고려하면 일본어 주격 조사 'の'의 영향을 받았을 것이라고 추론함. <span class="h1" data-rank="1">가설에 따르면 이러한 현상이 중세 시기에도 나타났을 수 있다고 추측하고 '그딋 혼 조초'에서 흔적을 찾아 자신의 논리를 뒷받침함</span>. 또한 중세 시기에 접속 조사가 마지막 체언에도 결합한다는 문법적 특징이 일본어의 접속 조사 'と'와 유사하다는 점도 가설의 근거로 제시함. <span class="h2" data-rank="2">추가로 한자어 'ㄹ의 비음화'를 학습하다 ㄷ 뒤에서 ㄹ의 비음화가 일어나는 경우를 찾을 수 없었던 경험을 토대로 '한자어 ㄹ 받침이 원래는 파열음이었을 것이다'라는 가설을 세우고 중국어의 입성과 동국정운의 예문을 활용하여 이를 검증함</span>. <span class="h3" data-rank="3">언어 인지 뇌과학 연구를 통해 궁극적으로 치매 치료 개발에 일조하려는 포부</span>를 언급하며 언어 탐구를 진로와 연계하는 모습이 탁월함.`,
+        comps:[
+          {r:1,name:'비판적·창의적 사고 역량',desc:'한-일 언어 유사성을 가설로 설정하고 중세 문헌 증거로 논리를 뒷받침하는 창의적 탐구',pct:55},
+          {r:2,name:'자기 성찰·계발 역량',desc:'새로운 의문에서 추가 가설을 설정하고 문헌으로 검증하는 자기주도 심화 학습',pct:30},
+          {r:3,name:'공동체·대인관계 역량',desc:'언어 탐구를 진로(치매 치료)와 연결하여 사회적 기여를 지향하는 확장된 학습 의지',pct:15}
+        ]
+      },
+      {
+        no:4,tab:'사례 4',subject:'문학',type:'세부능력 및 특기사항',
+        text:`국가 간 갈등이 전쟁으로 불거진 현실 상황에 대해 비판적으로 인지한 것을 계기로 과거 2차 세계 대전 당시 사람들의 고통에 공감하며 불안을 극복하는 방법을 배우기 위해 소설 '이방인(알베르 카뮈)'을 주제 도서로 선정하여 읽고 주도적인 독후 활동을 수행함. <span class="h1" data-rank="1">독서의 과정 중 느낀 감정과 의견을 틈틈이 일지로 작성하였으며 이 내용을 재구조화하고 교사의 피드백을 구하며 살을 붙여 한 편의 완성도 높은 서평을 작성함. 작가는 '무너진 상식에 대한 극복 의지'에 대해 말하고자 한다는 해석을 밝히며 작중 재판 장면에서 맥락에 대한 고려 없이 자신의 역할만을 수행하는 인물들의 모습에서 역할보다 본질이 중요함을 깨닫게 됨</span>. 또한 전후 소설이라는 점에 초점을 맞추어 교과 시간에 학습한 '최척전(조위한)'과 현대소설 '소문의 벽(이청준)'을 엮어 구성을 비교하는 한편, <span class="h2" data-rank="2">작중 인물이 전후 트라우마를 극복하기 위해 '자기 진술'로서 소설을 쓰는 모습에 주목하여 문학의 효용 중 치유의 기능과 효과에 대해 분석하여 통찰력이 엿보이는 보고서를 작성함</span>. <span class="h3" data-rank="3">"본질을 추구하는 삶이란?"이라는 질문에 자신만의 부조리를 인지하고 변화를 추구하며 살아야 한다는 가치관을 밝힘</span>.`,
+        comps:[
+          {r:1,name:'비판적·창의적 사고 역량',desc:'카뮈 소설을 현대 사회와 연결하여 독창적인 해석을 도출하고 완성도 높은 서평으로 작성',pct:50},
+          {r:2,name:'문화 향유 역량',desc:'세 작품을 교차 분석하여 문학의 치유 기능에 대한 깊은 통찰을 담은 보고서 작성',pct:30},
+          {r:3,name:'자기 성찰·계발 역량',desc:'문학을 통해 삶의 본질에 대한 자신만의 가치관을 형성하는 성찰 역량',pct:20}
+        ]
+      },
+      {
+        no:5,tab:'사례 5',subject:'독서와 작문',type:'세부능력 및 특기사항',
+        text:`평소 사람의 행동의 원인에 관심을 가지고 그 해답을 뇌과학에서 찾고자 책 '이토록 뜻밖의 뇌과학(리사 펠드먼 배럿)'을 읽고 <span class="h1" data-rank="1">뛰어난 문해력을 바탕으로 글을 구조적으로 이해하는 독서 능력이 보임</span>. '소아기 때 발생하는 정신질환은 오로지 후천적인 양육환경에 의해 결정된다고 할 수 있는가?'에 대해 논하며 책 '사피엔스(유발 하라리)'의 내용을 인용하여 비판적·창의적 사고 역량이 잘 드러나는 <span class="h2" data-rank="2">설득력이 있는 우수한 서평을 작성함</span>. 냄새를 인식하는 원리에 대한 독서 자료를 선정하여 중심 문장을 찾고, 다양한 요약하기 전략을 효과적으로 사용하여 요약하였으며 <span class="h3" data-rank="3">평소 생체 모방 기술에 대해 가지고 있던 자신의 배경지식을 독서 자료에 적용하여 인간의 오감이 복합적으로 작용하는 우리 몸의 기능에 대해 탐구하는 등 지식을 심화함</span>. 연금 재정 위기를 다룬 기사를 읽고 이론적 토대를 갖춘 심화 학습이 필요하다고 판단하여 '2030을 위한 연금개혁 보고서(장재혁)'를 독서 토론 도서로 제안하고 핵심 논지를 구조화하여 공유함으로써 모둠원들이 활동에 참여할 수 있도록 이끎.`,
+        comps:[
+          {r:1,name:'비판적·창의적 사고 역량',desc:'두 권의 서로 다른 책을 연결하여 비판적 질문을 생성하고 설득력 있는 서평을 작성',pct:50},
+          {r:2,name:'의사소통 역량',desc:'연금 개혁 쟁점을 논거로 활용하며 토론을 주도하고 논증의 타당성을 인정받음',pct:30},
+          {r:3,name:'자기 성찰·계발 역량',desc:'배경지식을 독서 자료에 능동적으로 적용하여 스스로 지식을 심화하는 자기주도 학습',pct:20}
+        ]
+      }
+    ]
+  },
+
+  math:{
+    label:'수학과',color:'var(--c2)',
+    items:[
+      {no:0,tab:'교과역량',subject:'',type:'',isComp:true},
+      {
+        no:1,tab:'사례 1',subject:'공통수학1',type:'세부능력 및 특기사항',
+        text:`이차함수 단원에서 수업 중 다룬 포물선의 성질을 실제 사례에 적용해보는 활동에서 흥미를 보였으며, '포물선의 형태를 활용한 조명 설계 원리 분석'을 주제로 탐구함. <span class="h1" data-rank="1">가정용 조명, 자동차 전조등, 위성 접시 안테나 등 다양한 예시를 조사하고 이를 수학적 표현(정점, 축, 초점거리)과 연결지어 설명함. 단순 이론 이해에 그치지 않고, 조도의 분포와 포물선 함수의 계수 변화 간 관계를 그래프로 분석하여 '실생활의 설계 원리 속에 수학이 어떻게 개입되어 있는가'라는 지적 호기심을 발전시킴</span>. <span class="h2" data-rank="2">이후 교과 밖에서 '음향 반사 구조물의 곡선 설계'에 대한 추가 탐색까지 확장하며 수학을 기반으로 한 융합적 사고를 보여줌</span>. 또 수학1 시간에 배운 기본 개념을 적용해 진동수를 이용한 화음의 일반항을 수식으로 표현해보는 등 물리와 수학과 음악을 융합하여 이해함. <span class="h3" data-rank="3">단진자를 이용하여 중력가속도 측정 탐구 실험에서 주어진 과제에 추가로 중심각을 변인으로 설정하여 실험을 스스로 계획 주도함. 상대오차 계산 후 중심각과 각운동 두 가지 요인을 오차의 원인으로서 추론하고 주기 관련 수식이 중심각이 작은 경우에만 성립하는 점을 깨닫고 중심각이 큰 측정 방법에 대한 의문을 품고 선생님께 질문하는 등 자기주도적 탐구력이 돋보임</span>.`,
+        comps:[
+          {r:1,name:'연결 역량',desc:'포물선 수학 개념을 조명·안테나 등 실생활 설계 원리와 연결하는 교과 통합 사고',pct:50},
+          {r:2,name:'문제해결 역량',desc:'그래프 분석을 통해 계수 변화와 조도 분포의 관계를 탐구하는 수학적 문제해결',pct:30},
+          {r:3,name:'추론 역량',desc:'음향 반사 구조물로 탐구를 확장하는 논리적 추론 및 융합적 사고',pct:20}
+        ]
+      },
+      {
+        no:2,tab:'사례 2',subject:'공통수학2',type:'세부능력 및 특기사항',
+        text:`비둘기집의 원리에 관한 다양한 명제를 직접 증명해 보고, 비둘기집의 원리가 적용되는 함수는 일대일 대응이 될 수 없음을 설명함. <span class="h1" data-rank="1">비둘기집의 원리를 이용하여 연속된 n개의 자연수의 합으로 이루어진 수의 집합에는 반드시 n의 배수가 존재함을 증명하고, n개의 물건을 m개의 상자에 임의로 넣을 때 같은 상자에 물건이 들어갈 확률과 n명의 생일이 같을 확률을 계산함</span>. 경우의 수 단원에서 색칠 문제를 학습하고 정사각형으로 이루어진 도형을 색칠하는 경우의 수에 관한 공식을 유도하기 위해 친구들과 함께 탐구 활동을 진행함. <span class="h2" data-rank="2">f(2,k), f(n,2), f(3,k), f(4,k)의 공식을 유도한 뒤 f(n,k)의 일반화 공식을 유도하지는 못했으나 그동안의 연구 과정을 정리하여 설명함</span>. <span class="h3" data-rank="3">수학적 사고력과 문제해결 능력을 갖춘 학생으로 교사가 제시하는 수학적 개념이나 증명에 관한 질문을 적극적으로 대답하고 설명하는 능력이 있고, 교사의 조언에 따라 자신의 논리적 오류를 이해하고 이를 수정하는 모습을 보임</span>.`,
+        comps:[
+          {r:1,name:'추론 역량',desc:'비둘기집 원리를 일반화하여 확률과 연결 짓는 수학적 추론 능력',pct:50},
+          {r:2,name:'문제해결 역량',desc:'색칠 문제의 일반화 공식 유도 과정을 체계적으로 탐구하는 문제해결 역량',pct:30},
+          {r:3,name:'의사소통 역량',desc:'오류를 수정하며 논리적 사고를 공유하고 동료와 소통하는 역량',pct:20}
+        ]
+      },
+      {
+        no:3,tab:'사례 3',subject:'미적분Ⅰ',type:'세부능력 및 특기사항',
+        text:`극한의 활용 문제에서 넓이비는 닮음비의 제곱임을 이용한 자신만의 풀이를 선보임. <span class="h1" data-rank="1">발표에 앞서 삼각형과 평행선에서의 닮음에 관한 간단한 예시를 들어 상기시킴으로써 발표의 전달력을 높임. 개념을 적재적소에 사용하는 능력이 뛰어나고 특히 수식을 인식하는 직관이 타 학생들에 비해 월등히 뛰어나며 문제 풀이에 그 아이디어가 잘 녹아듦</span>. 도함수 연속과 원함수 미분가능 조건이 필요충분 관계인지에 대해 의문을 가지고 탐구를 진행하여 사잇값 정리의 확장인 다르부 정리에 대해 알게 됨. <span class="h2" data-rank="2">의문을 해소하기 위해 다르부 정리의 대우 명제를 4가지 유형의 불연속점에 적용시켜 존재하는 도함수 모양을 파악하는 독특한 문제 해결 방안에서 창의성과 논리성이 두드러짐</span>. 그 결과 도함수가 진동 불연속할 때 원함수가 미분가능한 케이스를 발견하여 발표함. <span class="h3" data-rank="3">탐구 과정에서 바이어슈트라스 함수 등 병리적 함수를 접하고 해석학에 대한 흥미를 보임</span>.`,
+        comps:[
+          {r:1,name:'의사소통 역량',desc:'자신만의 풀이를 동료에게 직관적으로 전달하는 수학적 의사소통 역량',pct:40},
+          {r:2,name:'추론 역량',desc:'다르부 정리를 4가지 불연속점에 적용하여 도함수 형태를 논리적으로 탐구',pct:40},
+          {r:3,name:'문제해결 역량',desc:'병리적 함수로 탐구를 확장하며 해석학의 심화 영역을 자기주도적으로 탐색',pct:20}
+        ]
+      },
+      {
+        no:4,tab:'사례 4',subject:'공통수학(페르마 포인트)',type:'세부능력 및 특기사항',
+        text:`'거리의 합의 최소'를 구하는 다양한 방법에 호기심을 느껴 삼각형의 내부의 한 점에서 세 꼭짓점에 이르는 거리의 합이 최소인 페르마 포인트에 대한 탐구를 진행함. <span class="h1" data-rank="1">페르마 포인트를 구하는 여러 가지 방법을 조사하였으며 페르마 포인트에서 거리가 최소임을 다각형을 한 점을 기준으로 60도 회전시킨 후 삼각형의 합동 조건과 정삼각형의 성질을 활용하여 증명함</span>. 다각형 내부의 한 점에서의 꼭짓점에 이르는 거리의 합이 최소인 스타이너 포인트를 찾는 방법을 탐구하였으며 이 과정에서 <span class="h2" data-rank="2">삼각형의 외접원을 이용하여 사각형과 오각형의 스타이너 포인트를 구해봄</span>. 추후에 입체도형에서의 스타이너 포인트를 구하는 방법을 알아보고자 하는 의지를 다짐. 순열과 조합을 학습하며 배운 경우의 수가 법정에서 판결을 뒤엎을 수 있음을 알고 '법정에 선 수학(레일라 슈넵스, 코랄리 콜메즈)'을 읽고 어맨다 녹스 사건을 탐구하며 확률 실험의 신뢰도를 높이는 방법을 알아봄. <span class="h3" data-rank="3">페르마 포인트와 스타이너 포인트가 통신선, 도로 및 철도망 또는 움직이는 물체의 궤적 등을 최소 비용으로 연결하는 것에 적용될 수 있음을 깨닫고 수학적 이론을 실생활에 유용하게 활용할 수 있는 방안을 고민하는 계기가 됨</span>.`,
+        comps:[
+          {r:1,name:'추론 역량',desc:'회전 변환과 합동 조건을 활용하여 페르마 포인트를 논리적으로 증명',pct:50},
+          {r:2,name:'문제해결 역량',desc:'스타이너 포인트로 탐구를 확장하여 사각형·오각형 경우를 직접 탐구',pct:30},
+          {r:3,name:'연결 역량',desc:'수학적 최적화 이론을 통신·교통망 실생활에 연결하는 응용적 사고',pct:20}
+        ]
+      },
+      {
+        no:5,tab:'사례 5',subject:'확률과 통계',type:'세부능력 및 특기사항',
+        text:`조건부 확률과 베이즈 정리를 사후 확률 추정을 위해 사용하는 관점이 있음을 알게 되어 탐구하고 발표함. <span class="h1" data-rank="1">빈도주의와 베이즈주의의 차이점을 명확하게 이해하고, 이를 진화론의 발전 과정에 적용하여 증거가 추가됨에 따라 사후 확률이 정확해지는 과정을 명료하게 설명함</span>. 통계 자료를 능숙하게 이용하여 정보를 추출하는 능력이 뛰어난 학생으로 연도별 우리나라 산업 구조 및 안전 관리에 관한 국가 통계를 찾아 사업체 규모별 경제적 소실과 사망만인율을 주제로 양적 연구를 진행하고 이를 토대로 산업재해 안전관리 문제에 대해 해결 방안을 제안함. <span class="h2" data-rank="2">사업체 규모에 따른 사망만인율에 대한 공공데이터를 비지도학습 기법 중 하나인 군집화를 사용해 분석하고 상관 분석을 이용해 사업체 규모와 사망률 간의 -0.301의 음의 상관관계를 확인함</span>. <span class="h3" data-rank="3">루뱅 클러스터링을 이용하여 5인 미만 기업, 중소기업, 대기업을 대표하는 3가지 군집을 분류하고 그 결과를 좌표평면상에 색으로 구분하여 시각화함</span>.`,
+        comps:[
+          {r:1,name:'추론 역량',desc:'베이즈 정리를 진화론에 적용하여 사후 확률 추정 과정을 논리적으로 설명',pct:40},
+          {r:2,name:'정보처리 역량',desc:'공공데이터를 군집화·상관분석으로 처리하여 산업재해 관계를 수치화',pct:40},
+          {r:3,name:'문제해결 역량',desc:'통계 분석 결과를 시각화하고 하청업체 안전관리 개선안을 제안',pct:20}
+        ]
+      }
+    ]
+  },
+
+  english:{
+    label:'영어과',color:'var(--c3)',
+    items:[
+      {no:0,tab:'교과역량',subject:'',type:'',isComp:true},
+      {
+        no:1,tab:'사례 1',subject:'영어Ⅰ',type:'세부능력 및 특기사항',
+        text:`수업 시간에 'The Value of Talent' 단원을 학습한 후 집단의 능력에 영향을 미치는 구성원의 역할에 대해 탐구한 내용을 영문 에세이로 작성하여 발표함. <span class="h1" data-rank="1">이 글에서 시너지효과, 집단지성, 링겔만 효과에 대해 사례를 들며 치밀하게 조사하고 발전을 위해서는 집단 내에서 개인주의적 개인과 이타주의적 개인의 조화가 중요하다고 주장하는 등 학생의 훌륭한 사회심리학적 소양이 엿보임</span>. 또한 'The Globalization of Infection' 단원을 학습한 후 보건 문제에 관심을 가지고 <span class="h2" data-rank="2">세계보건기구(WHO)의 전염병 대처법에 대해 관련 자료를 조사하고 영문 에세이를 작성함. WHO의 범세계적 조직구조와 천연두, 말라리아, 코로나19 등의 역사적 사례에서 WHO가 관여한 전염병 연구, 백신 유통 과정, 보건 교육 등을 설명하고 전염병 피해예방을 위해 낙후 지역의 보건 교육과 예방접종의 중요성을 피력함</span>. 이 글들의 작성 과정에서 학우들과 상호 피드백을 통해 한층 더 완성도 높은 글을 완성함. <span class="h3" data-rank="3">풍부한 어휘력과 문법, 독해 능력을 갖추고 있고 담당교사에게 학습한 대로 동의어 활용을 통해 같은 단어 중복 사용을 피함으로써 수준 높은 영작문을 작성함</span>.`,
+        comps:[
+          {r:1,name:'영어 의사소통 역량',desc:'사회심리학 개념(시너지·링겔만)을 활용한 논리적 영문 에세이 작성',pct:50},
+          {r:2,name:'지식정보처리 역량',desc:'WHO 관련 자료를 조사·분석하여 영어로 재구성하는 정보 처리 역량',pct:30},
+          {r:3,name:'자기관리 역량',desc:'동의어를 활용하는 등 영어 표현력을 자기주도적으로 세련되게 가다듬는 역량',pct:20}
+        ]
+      },
+      {
+        no:2,tab:'사례 2',subject:'영어Ⅱ',type:'세부능력 및 특기사항',
+        text:`진로 관련 독서 경험을 소개하는 글쓰기에서 '아내를 모자로 착각한 남자(올리버 색스)'가 저명한 신경과 전문의가 그의 많은 환자들 중에서 흔치 않은 증상을 가진 24명의 환자들에 대해 쓴 일종의 의학 보고서라고 <span class="h1" data-rank="1">문법적 오류가 없이 단 한 문장으로 표현해 학생의 뛰어난 구문 활용력이 돋보임</span>. 과학 기술을 소개하는 발표 활동에서 장기이식의 면역 거부반응을 사전 제거하는 기술에 대해 설명함. <span class="h2" data-rank="2">'항체 약물 복합체'로 장기이식 수용자의 조혈모세포를 없애고 기증자의 줄기세포로 대체한다는 개념을 소개하고 쥐를 실험체로 하는 두 단계의 실험을 묘사하면서 어려운 단어를 주석으로 제시하여 이해를 도움</span>. 회화 수업을 지도하는 원어민 교사로부터 적극적으로 질문을 하고 수업에서 배운 점을 적용하려는 태도가 매우 감명 깊었다는 평을 받음. <span class="h3" data-rank="3">'올해의 기사 선정하기' 활동에서 북미 지역의 기록적 한파를 다룬 기사를 찾은 후 현재 완료 수동 표현을 문맥에 맞게 해석하는 뛰어난 독해력을 보임</span>.`,
+        comps:[
+          {r:1,name:'영어 의사소통 역량',desc:'복잡한 의학 서적 내용을 단 한 문장으로 표현하는 뛰어난 구문 활용 능력',pct:45},
+          {r:2,name:'지식정보처리 역량',desc:'첨단 의료 기술 개념을 영어로 조사·정리하여 청중에게 명확하게 전달',pct:35},
+          {r:3,name:'자기관리 역량',desc:'영문 기사에서 문법(현재완료 수동)을 문맥 속에서 자기주도적으로 분석하는 학습 태도',pct:20}
+        ]
+      },
+      {
+        no:3,tab:'사례 3',subject:'공통영어1',type:'세부능력 및 특기사항',
+        text:`A New of Space 단원 수업에서 허블 망원경의 성과를 접한 뒤, <span class="h1" data-rank="1">제임스 웹 우주망원경으로 탐구 주제를 확장하는 자기주도적 학습 태도를 보임. NASA 공식 사이트의 영문 기술 자료를 직접 해독하며 주 거울 크기, 관측 파장, 궤도 등 핵심 데이터를 비교 분석함. 이 과정에서 영어 원문 자료가 과학 지식 습득의 장벽이 아니라 핵심 도구임을 입증함</span>. 특히 <span class="h2" data-rank="2">redshift(적색편이)나 infrared imaging(적외선 촬영)과 같은 고등 과학 개념을 '우주 팽창으로 늘어난 빛', '열화상 카메라 원리'처럼 창의적인 비유를 들어 동료들에게 설명하는 지적 나눔을 실천함</span>. 탐구 결과를 'Hubble vs. Webb'라는 제목의 영문 PPT로 제작하여 논리적으로 발표하였으며, <span class="h3" data-rank="3">나아가 '영어 과학 유튜브' 대본을 작성하는 등 복잡한 정보를 명료한 영어로 재가공하여 확산시키는 매체 활용 능력과 탁월한 의사소통 능력을 보임</span>.`,
+        comps:[
+          {r:1,name:'자기관리 역량',desc:'수업 내용을 넘어 NASA 영문 기술 자료를 스스로 탐색·분석하는 자기주도 학습',pct:40},
+          {r:2,name:'영어 의사소통 역량',desc:'어려운 과학 개념을 창의적 비유로 동료에게 설명하는 영어 소통 역량',pct:35},
+          {r:3,name:'지식정보처리 역량',desc:'영문 PPT와 유튜브 대본으로 정보를 재가공하여 공유하는 매체 활용 능력',pct:25}
+        ]
+      },
+      {
+        no:4,tab:'사례 4',subject:'영어Ⅱ (뇌과학)',type:'세부능력 및 특기사항',
+        text:`기초 학술 주제에 관한 말이나 대화를 듣고 사실 정보를 바탕으로 주요 내용을 정확하게 파악할 수 있음. 고급생명과학 시간에 배운 줄기세포에 관하여 추가 정보를 얻고자 관련 TED 영상을 청취한 후 그 내용을 재구성하여 <span class="h1" data-rank="1">'How we're reverse engineering the human brain in the lab'라는 제목의 영어 뉴스 기사를 작성함. 사람의 피부 조직으로부터 역분화시킨 줄기세포를 성장시켜 뇌유기체를 만들고 이들이 모여 회로를 이루면 뇌 어셈블로이드가 되며 중추 신경계의 특정 역할을 대신 수행할 수 있음을 설명함</span>. <span class="h2" data-rank="2">흐름이 자연스럽고 영어 사용에 막힘이 없도록 적절한 어휘와 정확한 언어 형식을 활용하여 효과적으로 내용을 발표함</span>. <span class="h3" data-rank="3">질문을 통해 청중과 상호 작용을 끌어내고자 노력하며 다른 발표자의 발표를 경청하며 토론을 통해 창의적 비판적 사고로 문제를 해결하고자 노력함</span>.`,
+        comps:[
+          {r:1,name:'지식정보처리 역량',desc:'TED 영상 청취 후 복잡한 뇌과학 내용을 영어 기사로 재구성하는 정보 처리 역량',pct:45},
+          {r:2,name:'영어 의사소통 역량',desc:'자연스러운 어휘·문법으로 학문적 내용을 청중에게 효과적으로 전달',pct:35},
+          {r:3,name:'공동체 역량',desc:'질문으로 청중과 상호작용하고 동료 발표를 경청하며 토론에 기여하는 역량',pct:20}
+        ]
+      },
+      {
+        no:5,tab:'사례 5',subject:'영어Ⅱ (원서 읽기)',type:'세부능력 및 특기사항',
+        text:`영어구사능력이 매우 우수하고 리더십이 뛰어나 영어 교수학습활동에서 두각을 나타내어 개인활동과 모둠활동 모두를 성공적으로 이끎. 'The Geography of Thought(Richard Nisbett)' 원서를 읽고 <span class="h1" data-rank="1">문화가 인지 사고 과정에 영향을 미칠 수 있음을 인식하고 이에 관한 자신의 입장과 주장을 정리한 후 영어 프리젠테이션으로 발표함. 자연스러운 발음과 억양으로 전달력이 우수한 발표를 하고 내용 구성에 있어서는 논리적인 전개가 돋보임</span>. 팀프로젝트인 영어 책 만들기 활동에서 플라톤의 동굴 비유를 주제로 수준 높은 영어 책을 완성함. <span class="h2" data-rank="2">모둠 활동에서의 배려하는 태도가 바람직하고 심도 깊게 주제를 탐색하는 뛰어난 능력을 보이며 토의를 거쳐 의사결정에 이르는 과정에 열정을 보여줌</span>. 'The Selfish Gene(Richard Dawkins)' 1장 원서 읽기 수업에서 <span class="h3" data-rank="3">풍부한 어휘 및 문장구조와 용법에 대한 높은 이해와 활용을 바탕으로 깊이 있게 작품을 해석해 내고 다각도로 분석하는 능력이 탁월함. 단순한 원서 해석에 그치지 않고 전체 맥락 속에서의 의미를 파악하고 나아가 다른 학문 분야와의 연계 학습을 하려는 노력이 인상적임</span>.`,
+        comps:[
+          {r:1,name:'영어 의사소통 역량',desc:'원서 독해 후 문화-인지 관계에 대한 자신의 논지를 영어 발표로 설득력 있게 전달',pct:45},
+          {r:2,name:'공동체 역량',desc:'모둠 토의를 이끌며 배려와 협력으로 공동 결과물을 완성하는 리더십',pct:30},
+          {r:3,name:'지식정보처리 역량',desc:'원서를 다각도로 분석하고 타 학문과 연계하여 지식을 확장하는 정보 활용 역량',pct:25}
+        ]
+      }
+    ]
+  },
+
+  social:{
+    label:'사회과',color:'var(--c4)',
+    items:[
+      {no:0,tab:'교과역량',subject:'',type:'',isComp:true},
+      {
+        no:1,tab:'사례 1',subject:'통합사회1',type:'세부능력 및 특기사항',
+        text:`우리나라의 심각한 저출산과 고령화의 원인과 해결 방안에 대해 학습하고 탐구함. 교과서에서 다룬 해결 방안이 다소 추상적이고 부족하다고 느껴 추가 활동을 진행함. '인구 미래 공존'을 읽고 해외 사례 분석과 팀원 토의를 거쳐 노인 일자리 사업 추진, 이주노동자 규제 완화, 북한과 인적교류 확대, 국토 불균형 해소를 해결 방안으로 도출함. <span class="h1" data-rank="1">관계 인구 등의 개념을 적용하고 다양한 통계, 그래프를 이용하여 시각화하는 등 수준 높은 발표로 큰 호응을 얻음. 출산율 증감 관련 질의 응답 과정에서 남녀 성비 기준으로 자료를 재해석하여 창의적, 논리적으로 답변함</span>. 기본권 보장을 위한 구제 수단을 학습한 후 <span class="h2" data-rank="2">국가인권위원회 사이트에서 실제 사례를 탐색함. '의사의 진단명 미고지로 인한 노인 인권 침해' 사례를 선정하여 진정 요지, 결정 주문, 침해된 권리를 정리하고 알 권리와 자기 결정권의 정의 및 역사적 배경, 관련 법 규정 등을 조사하여 제시함</span>. <span class="h3" data-rank="3">사례에서 치매 발병에 따른 의사 능력 상실이 주요 내용인 것을 파악한 후 고령화 사회에서 퇴행성 뇌 질환 증가로 이와 비슷한 사례가 늘어날 수 있다는 것을 언급하며 새로운 형태의 인권이 규정되어야 한다고 주장함</span>.`,
+        comps:[
+          {r:1,name:'창의적 사고력',desc:'성비 관점으로 통계를 재해석하고 인구 문제에 창의적 해결방안을 도출',pct:40},
+          {r:2,name:'정보 활용 능력',desc:'국가인권위원회 실제 사례를 탐색하여 법적 근거를 체계적으로 분석·제시',pct:35},
+          {r:3,name:'문제해결력 및 의사결정력',desc:'치매 사례를 고령화 사회 구조적 문제로 확장하고 새로운 인권 규정을 제안',pct:25}
+        ]
+      },
+      {
+        no:2,tab:'사례 2',subject:'현대 사회와 윤리',type:'세부능력 및 특기사항',
+        text:`토론활동에 활발하게 참여하고 교과서 외 매체에서 접한 칸트의 의무론 내용을 교과서 내용과 연계해 질의하는 등 교사와 적극적으로 소통하며 배움을 확장해 나감. <span class="h1" data-rank="1">윤리적 딜레마를 논리적으로 분석하고 윤리적 주관을 바탕으로 자기의 생각을 명확하게 발표할 수 있음. '암 말기 환자에게 사실을 말해야 하는가' 가상사례 분석 활동에서 칸트의 '윤리형이상학정초'를 바탕으로 남편의 행동을 분석함. 남편이 아내를 보호한다는 명분으로 아내에게 질병의 진실을 숨기는 것이 윤리적으로 부적절하다고 평가함</span>. '차가운 의학, 따뜻한 의사(로렌스 샤벳)'을 읽은 후 <span class="h2" data-rank="2">의학 분야의 인문학적 측면과 환자-의사 간 신뢰 관계(라포) 형성이 중요하다는 생각을 글로 정리하여 제시함. 의학적 지식과 인간적 소통의 조화를 강조하며 좋은 라포를 통해 환자의 복지에 기여할 수 있다는 생각을 전개함</span>. <span class="h3" data-rank="3">가상사례 분석에 재적용하며 환자와 의료진과의 라포가 제대로 형성되지 않았을 가능성을 지적함. 라포가 잘 형성되었다면 환자와 가족이 의료 상황에 대한 합리적 판단을 내릴 수 있었을 것이라고 주장함</span>.`,
+        comps:[
+          {r:1,name:'비판적 사고력',desc:'칸트 의무론을 의료 윤리 딜레마에 적용하여 비판적으로 분석하는 역량',pct:45},
+          {r:2,name:'창의적 사고력',desc:'라포 개념을 의료 윤리와 융합하여 새로운 관점으로 문제를 재해석',pct:35},
+          {r:3,name:'문제해결력 및 의사결정력',desc:'라포 부재를 원인으로 지목하고 합리적 의사결정 방안을 논리적으로 제시',pct:20}
+        ]
+      },
+      {
+        no:3,tab:'사례 3',subject:'사회와 문화',type:'세부능력 및 특기사항',
+        text:`수업시간마다 맨 앞자리에서 수업을 집중하며 경청하고 좋은 수업분위기를 이끎. 상징적 상호작용론에 입각하여 노키즈존과 노시니어존을 바탕으로 세대 갈등에 대해 분석함. <span class="h1" data-rank="1">특정 연령층이 특정 장소에 대해 제한을 받으면 다른 연령층은 그들의 경험과 관점을 이해하기 어려워지고 결국 그들끼리의 소통만 하게 되는 반향실효과가 일어날 수 있음을 역설함</span>. 대리모에 대한 토론활동 후 다른 나라와 한국의 대리모 관련 정책이 변모하는 과정을 통시적으로 탐구함. <span class="h2" data-rank="2">'생명윤리 및 안전에 관한 법률'을 바탕으로 대리출산의 과정에서 법률이 적용되는 경우와 법률이 적용되지 않은 경우를 구분하며 법률이 적용되지 않는 경우에 대한 추가 법안 검토가 필요하다고 주장함</span>. <span class="h3" data-rank="3">대리모의 허용과 비허용의 문제를 떠나서 현행법으로 보호할 수 없는 사례들에 대한 문제가 가장 심각하다고 주장하면서 의료 사각지대에 있는 대리모에 관한 법률의 필요성을 역설하는 등 탁월한 비판적 사고를 보임</span>.`,
+        comps:[
+          {r:1,name:'창의적 사고력',desc:'반향실효과 개념으로 세대 갈등을 독창적으로 분석하는 창의적 탐구 접근',pct:40},
+          {r:2,name:'비판적 사고력',desc:'현행법의 적용 범위를 분석하여 추가 법안의 필요성을 논리적으로 비판',pct:35},
+          {r:3,name:'공동체적 역량',desc:'법적 사각지대에 있는 당사자 보호를 주장하며 사회적 약자를 위한 제도 마련을 역설',pct:25}
+        ]
+      },
+      {
+        no:4,tab:'사례 4',subject:'통합사회2',type:'세부능력 및 특기사항',
+        text:`사회적 소수자 차별에 대해 학기별로 탐구 활동을 진행하여 각각 장애인 차별과 산업재해를 중심으로 실태를 조사하고 사회적, 개인적 해결방안을 제시함. <span class="h1" data-rank="1">산업재해의 원인으로 '위험의 외주화'를 지적하고 안전 관리 책임을 하청업체에 맡기는 하청 구조의 문제를 원청, 하청 기업, 저임금 노동자의 입장에서 각각 설명함</span>. 시장 경제에서 정부의 역할을 주제로 통화정책의 직/간접적 조절 수단, 명목 기준 지표, 파급경로와 확장적·긴축적 재정 정책에 대해 심도 있는 발표를 함. 특히 경제 안정화 정책의 한계점을 경상 수지 적자 상황의 총수요와 순수출의 상충 관계를 예시로 들어 설명함. <span class="h2" data-rank="2">사상가 인터뷰 활동에서 피터 싱어를 SWOT 기준에 따라 분석하고 그가 비건인 점을 종 차별주의, 효율적 이타주의, 실천 윤리학의 통합적 행위로 해석함</span>. 도시 문제 해결 아이디어를 발표하면서 정보 통신 기술을 이용해 도시의 교통 기능을 네트워크화하여 교통사고, 홍수 등 상황에 따라 신호 길이, 차선 등 조건을 조절하는 스마트 교통 시스템을 제안함. 세계화 현상에 대하여 조사 발표하면서 서울공화국 문제를 예시로 들어 지역화의 중요성을 강조하고 <span class="h3" data-rank="3">생물 다양성에 비유하여 획일적인 사회는 존속되기 어려움을 주장함</span>.`,
+        comps:[
+          {r:1,name:'비판적 사고력',desc:'위험 외주화의 구조적 원인을 다각도 행위자 관점에서 비판적으로 분석',pct:40},
+          {r:2,name:'창의적 사고력',desc:'피터 싱어의 비거니즘을 SWOT으로 분석하고 통합적 윤리 행위로 해석',pct:35},
+          {r:3,name:'문제해결력 및 의사결정력',desc:'ICT 기반 스마트 교통 시스템으로 도시 문제를 창의적으로 해결하는 제안',pct:25}
+        ]
+      },
+      {
+        no:5,tab:'사례 5',subject:'통합사회(공정무역)',type:'세부능력 및 특기사항',
+        text:`'자연과 인간의 공존' 수업 중 팜유 농장 개발 사례를 접하고 'RSPO' 제도를 주제로 심화 탐구하여 논문 및 보고서 분석으로 인증에도 열대림이 파괴되는 '그린워싱' 사례를 발견, 제도의 윤리적 딜레마와 실효성 문제를 지적함. <span class="h1" data-rank="1">'RSPO 인증' 구매가 '윤리적 소비'인지에 대해 공리주의의 유용성 측면과 의무론의 도덕적 의무 측면이 충돌함을 파악하고, '인간 중심주의'와 '생태 중심주의' 관점으로 한계를 분석하여 '지속가능한 발전'의 진정한 의미를 재해석하는 보고서를 작성함</span>. <span class="h2" data-rank="2">'우리 학교 윤리적 소비 캠페인'을 기획하여 교내 매점 팜유 실태를 조사해 시각화하고, 설문조사로 인지도와 구매 행동 간 격차를 분석함. 그린워싱 인포그래픽을 제작하고 매점에 'RSPO 인증' 도입을 건의하는 정책 제안서를 작성함</span>. 사회조사 방법 단원에서 수업 시간에 제시된 표본 조사 사례를 계기로 '청소년 스마트폰 사용 습관'에 대한 탐구 질문을 스스로 설정함. 조사 목적, 표본 집단, 설문지 문항 구성, 분석 방법 등을 직접 설계하여 학급을 대상으로 설문을 실시하고 결과를 도표화하며 분석함. <span class="h3" data-rank="3">단순 결과 요약에 그치지 않고 '사회문화적 배경에 따른 사용 행태의 차이'를 문화 자본 개념과 연결지어 해석하며, '디지털 기기 사용이 청소년의 여가 및 학습 패턴에 미치는 사회문화적 영향'으로 주제를 확장하여 사회문화통계 기반 연구로 발전시키고자 하는 생각을 피력함</span>.`,
+        comps:[
+          {r:1,name:'비판적 사고력',desc:'그린워싱 사례를 발견하고 공리주의·의무론·생태주의 다중 관점으로 비판',pct:45},
+          {r:2,name:'정보 활용 능력',desc:'설문·시각화로 인지도-구매 행동 격차를 데이터 기반으로 분석',pct:30},
+          {r:3,name:'공동체적 역량',desc:'정책 제안서로 학교 공동체의 윤리적 소비 문화 개선에 직접 참여',pct:25}
+        ]
+      }
+    ]
+  },
+
+  science:{
+    label:'과학과',color:'var(--c5)',
+    items:[
+      {no:0,tab:'교과역량',subject:'',type:'',isComp:true},
+      {
+        no:1,tab:'사례 1',subject:'통합과학1',type:'세부능력 및 특기사항',
+        text:`삼투 현상 관찰 실험을 통해 세포막을 경계로 한 물질의 출입 과정을 알아보려 함. 설탕 농도가 다른 용액이 이동한 양을 직접 측정해보며 반투과성 막을 경계로 한 삼투 현상을 직관적으로 확인함. <span class="h1" data-rank="1">실험 과정에서 결과 측정 및 진행을 조력하는 역할을 맡아 조원들과 협력해가며 주도적으로 내용을 정리하고 퀴즈 문제를 해결함. 실제 실험 진행 시 예상과는 달리 느린 투과 속도에도 당황하지 않고 원인을 정확히 분석하여 실험을 마무리해내며 과학 실험의 가치를 깨닫는 모습이 돋보임</span>. 체내 물질대사를 공부한 후 자료 조사를 진행하여 <span class="h2" data-rank="2">화학적 관점에서 효소의 반응과정을 정리함. 물질대사를 정의하고 동화작용과 이화작용을 구분하여 소개함. 물질대사는 생체 촉매인 효소가 관여하는 반응임을 알고, 활성화 에너지를 이용한 반응속도론을 바탕으로 물질대사 과정을 설명함</span>. <span class="h3" data-rank="3">ATP와 연계하여 물질대사 과정의 산물임을 파악하고 비만과 같은 대사성 질환 사례를 통해 물질대사가 원활하게 이루어져야 함을 강조함</span>.`,
+        comps:[
+          {r:1,name:'과학적 탐구 능력',desc:'예상과 다른 실험 결과에 당황하지 않고 원인을 논리적으로 분석하는 탐구 역량',pct:45},
+          {r:2,name:'과학적 사고력',desc:'효소 반응과 반응속도론을 화학적 관점으로 체계적으로 이해하는 과학적 사고',pct:35},
+          {r:3,name:'과학적 문제해결력',desc:'대사성 질환 사례로 연결하여 물질대사의 실생활 의의를 강조하는 문제해결 역량',pct:20}
+        ]
+      },
+      {
+        no:2,tab:'사례 2',subject:'물리학Ⅱ',type:'세부능력 및 특기사항',
+        text:`수업 시간에 항상 앞에 앉아 수업을 경청하고 문항 해결을 위한 핵심 질문을 자주하는 등 칭찬이 아깝지 않은 학생임. 물리 전반에 대한 이해도와 성취도가 뛰어나며 운동역학을 다루는 문항에서 창의적이고 간결한 풀이 과정을 자주 보임. 수업 자료 삽화로 제시한 뇌자도(MEG) 사진을 보고 <span class="h1" data-rank="1">그 원리에 대한 심도 있는 탐구를 이어감. 뇌의 신경세포에 전류가 흐르면서 발생하는 자기장을 통해 뇌기능을 진단하는 것으로 원리를 설명하였으며 미세자기장의 변화를 측정하기 위해 사용하는 센서가 초전도양자간섭소자(SQUID)임을 확인함. SQUID는 자기장의 변화를 측정하기 때문에 검사실 주위에서 흐르는 교류 전류에 의한 자기장이 잡음이 될 수 있어 자기차폐실 안에서 진단해야 함을 언급하는 등 탐구 과정에서 깊이 있는 물리학 배경 지식을 보여줌</span>. <span class="h2" data-rank="2">대뇌피질의 신경세포가 과도하게 흥분하며 발생하는 뇌전증의 진단에 MEG가 쓰일 수 있다고 소개하고 수술 전 뇌기능 매핑, 인지 기능 연구, 정신 질환 연구 등에 쓰일 수 있음을 설명하는 모습에서 물리와 의학을 융합해서 탐구할 수 있는 능력이 확연히 돋보임</span>. <span class="h3" data-rank="3">MEG와 함께 CT, MRI, fMRI, PET 등의 예시를 들며 의공학의 발전이 의사의 진단에 큰 도움이 될 수 있음을 역설함</span>.`,
+        comps:[
+          {r:1,name:'과학적 사고력',desc:'MEG-SQUID 작동 원리를 깊이 있게 탐구하며 자기차폐 필요성까지 논리적으로 설명',pct:45},
+          {r:2,name:'과학적 문제해결력',desc:'물리 원리를 뇌전증 진단·뇌기능 매핑 등 의학 응용으로 연결하는 융합적 사고',pct:35},
+          {r:3,name:'과학적 의사소통 능력',desc:'다양한 의료 영상 장비를 비교하며 의공학 발전의 의의를 청중에게 설득력 있게 전달',pct:20}
+        ]
+      },
+      {
+        no:3,tab:'사례 3',subject:'화학Ⅱ',type:'세부능력 및 특기사항',
+        text:`탁월한 문제 해결력을 바탕으로 복잡한 문제를 해결하고 이를 논리적으로 설명해 다른 학생들의 학습을 도움. 기체에 대한 복합 문제 풀이를 간단한 비례식만을 통해 풀이한 후 문제 해결 접근법을 발표하고 화학 반응식의 반응계수가 자연수인 점을 활용한 창의적인 부정방정식 풀이를 친구에게 설명해 줌. 전기 화학과 이용을 학습 후 <span class="h1" data-rank="1">열역학적인 깁스 에너지의 정의와 전기에너지로 정의되는 깁스 에너지를 설명하고 네른스트식을 유도함. 일, 엔탈피, 엔트로피에 대해 서술한 후 깁스 자유에너지의 필요성에 대해 우주와 계의 차이점을 설명하고 네른스트식을 도출함. 이 과정에서 골드만-호지킨-카츠식(GHK equation)을 접하고 이를 증명하기 위해 필요한 공식들인 픽의 확산 법칙, 아인슈타인 관계식, 미시적 옴의 법칙을 조사해 소개함</span>. 탐구에 대한 열의가 강한 학생으로 <span class="h2" data-rank="2">열역학과 네른스트식부터 GHK식을 이해하고 이를 토대로 신경세포의 막전위를 해석하며 저칼륨혈증과 고칼륨혈증의 증상들을 분석하는 융합적 탐구 역량을 발휘함</span>. <span class="h3" data-rank="3">탐구 내용을 완성도 높은 보고서로 작성하고 발표 자료를 제작해 학생들에게 설명하는 등 지식 나눔을 실천함</span>.`,
+        comps:[
+          {r:1,name:'과학적 사고력',desc:'깁스 에너지-네른스트식-GHK식을 단계적으로 유도하는 심층적 과학 사고',pct:45},
+          {r:2,name:'과학적 문제해결력',desc:'전기화학 지식을 신경세포 막전위 및 혈중 전해질 질환 분석에 융합 적용',pct:35},
+          {r:3,name:'과학적 의사소통 능력',desc:'완성도 높은 보고서와 발표 자료로 심층 탐구 결과를 동료와 공유',pct:20}
+        ]
+      },
+      {
+        no:4,tab:'사례 4',subject:'통합과학2 (이온결합)',type:'세부능력 및 특기사항',
+        text:`이온 결합 물질과 공유 결합 물질의 전기 전도성 비교 탐구에서 <span class="h1" data-rank="1">고체와 수용액 상태를 구분하여 측정하고 증류수를 대조군으로 설정해 관찰의 타당성을 확보하였음. 전류 유무를 이온의 이동 가능성으로 설명하여 NaCl과 CaCl₂ 간 전류 세기 차이를 이온 수와 전하량 및 농도 요인으로 가설화하고, 농도 단계별 용액을 제작해 추가 측정 계획을 보완하였음</span>. 결과를 표, 그래프로 정리하고 <span class="h2" data-rank="2">온도, 전극 간격, 용해 정도 등 오차 요인을 통제하려는 시도를 보였으며 입자 모형 그림을 활용해 거시적 성질을 미시적 구조로 연결해 서술하는 역량이 향상되었음</span>. <span class="h3" data-rank="3">추후 활동으로 '세상을 바꾼 화학(원정현)'을 읽고 전해질 용액 개념을 생활 사례로 확장하였으며 수돗물, 생수, 이온음료, 식초, 베이킹소다 용액의 전도성을 비교하는 생활 속 실험을 설계함. 또한 공유 결합 물질 중 산·염기가 물에서 전류를 흐르게 하는 예외 용액을 탐색하며 해리와 이온화 개념으로 설명하는 사고와 지식의 확장을 꾀함</span>.`,
+        comps:[
+          {r:1,name:'과학적 탐구 능력',desc:'대조군 설정·변인 통제·가설 설정으로 체계적인 실험을 설계하고 수행하는 탐구 역량',pct:50},
+          {r:2,name:'과학적 사고력',desc:'거시적 전도성 현상을 미시적 입자 구조와 연결하여 설명하는 과학적 사고',pct:30},
+          {r:3,name:'과학적 문제해결력',desc:'생활 속 음료에 탐구를 확장하고 예외 사례(산·염기)로 지식을 심화하는 문제해결 역량',pct:20}
+        ]
+      },
+      {
+        no:5,tab:'사례 5',subject:'생명과학Ⅰ',type:'세부능력 및 특기사항',
+        text:`항상 진정성 있는 태도가 돋보이는 학생으로 물질 대사와 효소에 대해 심화 탐구하여 발표함. <span class="h1" data-rank="1">풍부한 시각 자료와 함께 자신감 있는 설명이 돋보임. 효소의 역할에 따라 종류가 산화-환원 효소, 전이 효소, 이성질화 효소 등으로 구분됨을 설명하고 탈수소효소, 산화효소를 이용해 혈당측정기를 만드는 등의 의학 분야에서의 활용 사례와 원리에 대해 발표함</span>. <span class="h2" data-rank="2">세포 호흡에 대한 심화 탐구를 스스로 진행해 해당 과정, 피루브산 산화, 시트르산 회로 세 단계로 세포 호흡을 구분한 뒤 ATP를 에너지 화폐에 비유하고 에너지 투자기와 회수기로 나누어 해당 과정을 설명함. 스스로 학습한 내용을 자신만의 방법으로 정리한 학습지와 판서를 활용해 친구들에게 조리있게 설명하고 질의에 적절히 답하며 의사소통하는 모습이 기특한 학생임</span>. <span class="h3" data-rank="3">환경호르몬의 화학구조와 우리 몸에 미치는 영향에 대해 탐구하며 비스페놀 A, 알킬페놀 등의 특징과 구조를 살펴보고 영향에 대해 알아보는 모습을 보임</span>.`,
+        comps:[
+          {r:1,name:'과학적 의사소통 능력',desc:'효소 분류와 혈당측정기 원리를 시각 자료로 구성하여 청중에게 명확하게 전달',pct:40},
+          {r:2,name:'과학적 탐구 능력',desc:'세포 호흡을 3단계로 스스로 탐구·정리하고 동료에게 가르치는 자기주도 심화 학습',pct:40},
+          {r:3,name:'과학적 참여와 평생학습 능력',desc:'환경호르몬 탐구로 과학과 일상 건강의 관계를 자발적으로 탐구하는 학습 의지',pct:20}
+        ]
+      }
+    ]
+  },
+
+  history:{
+    label:'한국사',color:'var(--c6)',
+    items:[
+      {no:0,tab:'교과역량',subject:'',type:'',isComp:true},
+      {
+        no:1,tab:'사례 1',subject:'한국사1 (덕수궁 답사)',type:'세부능력 및 특기사항',
+        text:`역사 수업에 능동적으로 참여하고 학습태도가 우수하며 지적 호기심을 해결하려는 의지가 돋보임. 특히 한국 근현대사 중 아관파천과 고종의 경운궁 환궁에 대해 배운 후 경운궁에 대해 호기심을 가지고 덕수궁 답사를 진행하여 역사적 탐구력을 보여주었음(2022.10.29.). <span class="h1" data-rank="1">덕수궁 내의 석조전, 정관헌, 중명전 등을 살펴보고 관련 내용을 조사함. 석조전의 건축양식이 신고전주의 양식을 활용하였고, 정관헌이 서양 건축과 조선 전통 건축 양식을 절충한 건축물임을 직접 살펴보며 탐구함</span>. <span class="h2" data-rank="2">중명전을 답사하며 을사조약 체결의 배경과 당시의 모습에 대해서 조사함. 덕수궁 답사를 통해서 책으로만 배운 내용을 보다 입체적으로 받아들일 수 있었음. 답사를 통해 조선의 중심이었던 한양의 과거 모습과 당시 역사를 통해 궁궐의 건축양식을 살펴봄</span>. <span class="h3" data-rank="3">스스로 답사 계획을 세우고 직접 조사하는 것이 처음에는 힘들게 느껴졌으나 사전조사와 학습을 통해 답사를 해내며 지적 호기심을 주체적으로 해소함. 이후 고종의 경운궁 환궁의 결과에 대해 탐구해보기 위해 환구단 답사에 대한 계획을 세움</span>.`,
+        comps:[
+          {r:1,name:'역사 자료 분석과 해석',desc:'건축양식을 현장에서 분석하며 근대 역사를 입체적으로 해석하는 역량',pct:40},
+          {r:2,name:'역사 사실 이해',desc:'답사를 통해 아관파천·을사조약 등 근현대사 사실을 맥락 속에서 이해',pct:35},
+          {r:3,name:'역사적 판단력과 문제해결능력',desc:'지적 호기심을 스스로 해소하고 후속 답사까지 계획하는 자기주도 역사 탐구',pct:25}
+        ]
+      },
+      {
+        no:2,tab:'사례 2',subject:'한국사 (알렌과 근대 의학)',type:'세부능력 및 특기사항',
+        text:`'문화재 소개 인포그래픽 만들기'에서 '알렌의 진단서, 검안경, 제중원 1차년도 보고서'를 선정하여 발표함. <span class="h1" data-rank="1">의사 알렌과 관련된 여러 문화재의 역사적 연원과 특징, 의의를 상세히 조사하였으며 이를 바탕으로 '조선 양의학의 문을 연 알렌'이란 제목의 인포그래픽을 만듦. 그림, 사진 등 시각 자료를 활용해 문화재를 흥미롭게 소개하고 알렌의 시대와 현대의 의학을 비교하는 등 인포그래픽의 내용과 구성이 매우 참신하고 탁월함</span>. '한국사 가상 일기쓰기'에서 충렬왕 대 태의감 학생을 주인공으로 삼아 <span class="h2" data-rank="2">시공간적 배경이 구체적이고 역사적 사실과 잘 부합되는 가상일기를 작성함. 고려의 명의 설경성을 존경하는 주인공이 보낸 하루를 생동감 있게 그리는 역사적 상상력을 발휘하였고, 개인의 일상을 통해 시대상을 드러내는 구성 능력과 글솜씨가 탁월함</span>. <span class="h3" data-rank="3">'역사 롤모델 탐구'에서 박제가의 천연두 퇴치를 위한 노력에 초점을 맞춘 심화된 수준의 보고서를 제출함. '의학 연구의 목적은 제민'이라는 글에 크게 공감하며 환자를 적극적으로 돕고 질병에 대한 두려움을 줄이는 의료인이 되겠다고 포부를 밝힘</span>.`,
+        comps:[
+          {r:1,name:'역사 정보 활용 및 의사소통',desc:'역사 자료를 인포그래픽으로 시각화하여 흥미롭게 전달하는 역사 표현 역량',pct:40},
+          {r:2,name:'역사 자료 분석과 해석',desc:'역사적 상상력을 발휘하여 시대상을 생생하게 재현하는 역사적 감수성',pct:35},
+          {r:3,name:'정체성과 상호 존중',desc:'역사적 롤모델에서 의료인으로서의 가치관을 형성하고 포부를 밝히는 역량',pct:25}
+        ]
+      },
+      {
+        no:3,tab:'사례 3',subject:'한국사 (전염병과 역사)',type:'세부능력 및 특기사항',
+        text:`매 시간의 수업 내용을 연표로 정리하여 연대기 파악력이 향상되는 모습이 두드러짐. 꼬리를 무는 질문을 통해 관심사를 넓혀가고 심화 탐구를 진행함. 통합과학의 미생물과 전염병에 대한 연구가 인간의 삶의 질 향상에 지대한 영향을 미쳤다는 내용을 바탕으로 <span class="h1" data-rank="1">한국의 전염병은 우리 역사에 어떤 영향을 끼쳤는지에 호기심을 갖고 보고서를 작성함. 병자호란 당시 조선의 천연두 유행이 '생신'이었던 홍타이지에게 부담을 안겨 신속한 협상이 진행될 수 있었다는 점을 근거로 전염병은 의학사뿐 아니라 정치와 외교 등 인간의 삶 전반에 영향을 미친다는 점을 인식함</span>. <span class="h2" data-rank="2">이를 바탕으로 전염병을 치료하는 의학기술 발전 역시 역사를 크게 바꾸어 놓았을 것이라는 가설을 설정하여 2차 탐구를 진행함. '조선사람 허준(신동원)'을 읽고 허준이 광해군의 천연두를 치료함으로써 의학기술이 조선의 정치사에 영향을 미쳤음을 파악하였음</span>. <span class="h3" data-rank="3">또한 허준이 '언해두창집요'에서 밝힌 부녀자에게까지 의료 서비스를 제공해야 한다는 주장을 여성 인권 신장의 측면에서 바라보며 의학 기술 발전은 단순히 생명을 연장하는 것이 아닌 인권을 신장시키는 것임을 주장하며 현대 사회 역시 평등한 의료 서비스를 제공해야 한다는 의견을 피력함</span>.`,
+        comps:[
+          {r:1,name:'역사적 판단력과 문제해결능력',desc:'전염병과 정치·외교의 연관성을 귀납적으로 탐구하는 역사적 판단 역량',pct:45},
+          {r:2,name:'역사 자료 분석과 해석',desc:'허준 관련 문헌을 분석하여 의학사와 정치사의 연관성을 실증적으로 확인',pct:35},
+          {r:3,name:'정체성과 상호 존중',desc:'역사 속 인권 신장을 현대적 관점에서 재해석하며 평등한 의료의 가치를 역설',pct:20}
+        ]
+      },
+      {
+        no:4,tab:'사례 4',subject:'한국사2 (조선어 말살)',type:'세부능력 및 특기사항',
+        text:`일제가 펼친 조선어 말살 정책에 <span class="h1" data-rank="1">'왜 하필 언어를 말살하려고 했는가'라는 질문을 만들고 이를 탐구함. 언어와 민족성의 상관 관계 이론인 언어 민족주의에 대한 학술 자료를 탐독하여 답을 찾아나감</span>. '마지막 수업(알퐁스 도데)'을 읽고 프랑스 알자스 지방에서 독일군에 저항하며 자국민이 언어를 지켜야 하는 이유를 역설하는 선생님의 말씀을 인용해 언어제국주의를 경계해야 함을 강조함. <span class="h2" data-rank="2">훔볼트의 견해를 차용해 같은 언어사용자는 공동체 의식을 공유하며 개인에게 민족 구성원이라는 점을 일깨워 언어 민족주의를 내면화하도록 만든다고 설명함. 때문에 동일 언어를 사용하는 민족은 동일한 인식구조, 민족의식과 민족 감정을 공유할 수밖에 없고 이로 인해 일제가 일본어를 강제하고 한국어를 말살하려고 시도했다는 논리를 전개함</span>. <span class="h3" data-rank="3">이에 따라 조선어학회에서 필사적으로 한글과 한국어를 지키려는 시도가 단순히 언어를 보존하고자 함이 아니라 민족 정신을 수호하려는 노력이었다고 평가하는 데에서 비판적, 분석적 사고력이 돋보임</span>.`,
+        comps:[
+          {r:1,name:'역사 자료 분석과 해석',desc:'언어 민족주의 학술 자료를 탐독하여 일제 언어 정책의 의도를 분석',pct:40},
+          {r:2,name:'역사적 판단력과 문제해결능력',desc:'훔볼트 이론으로 조선어 말살 정책의 논리를 체계적으로 설명하는 역사적 판단력',pct:40},
+          {r:3,name:'정체성과 상호 존중',desc:'언어 수호 운동의 의미를 민족 정신 수호로 재해석하며 정체성 역량 발휘',pct:20}
+        ]
+      },
+      {
+        no:5,tab:'사례 5',subject:'한국사 (해수 구제사업)',type:'세부능력 및 특기사항',
+        text:`한국사를 바꾼 역사적 사건 탐구 활동에서 일제강점기를 주제로 설정해 <span class="h1" data-rank="1">조선인들을 일제의 식민 통치에 순응시키기 위해 자행한 해수 구제사업에 대한 탐구활동을 진행함. 사료를 읽고 역사 속에서 문제점을 찾아내는 능력이 뛰어난 학생으로 일제가 조선 독립의 이념적 의미를 가진 한반도 토종 동물을 해로운 동물로 규정해 무차별적인 학살을 자행했으며 이를 통해 한반도 토종 동물이 멸종하게 되었음을 언급함</span>. <span class="h2" data-rank="2">이외에도 가죽을 이용해 의류, 장식품을 만들기 위해 무차별적인 학살을 당한 독도 강치와 일본의 신성한 조각상인 고마이누와 닮은 개가 식민지에 있다는 이유로 학살 당한 토종견 동경이 등에 대해 조사하며 제국주의적 욕심으로 조선의 생태계를 파괴한 일제의 악행을 비판하며 역사적 판단력이 성장하는 모습을 보임</span>. 더 나아가 <span class="h3" data-rank="3">멸종된 한반도 토종 동물을 복원하기 위한 자연환경 보전법 등의 정책 및 인공 수정 등을 통해 전개된 삽살개 복원 정책에 대해 조사해 과거 역사 속 잘못을 바로잡기 위한 노력에 대해 고민하는 모습을 보임. 역사 속 잘못을 되풀이하지 않고 그 잘못을 바로잡기 위한 방안에 대해 고민하는 모습이 돋보이는 학생임</span>.`,
+        comps:[
+          {r:1,name:'역사 자료 분석과 해석',desc:'사료를 통해 해수 구제사업의 식민지 통치 의도를 비판적으로 분석',pct:45},
+          {r:2,name:'역사적 판단력과 문제해결능력',desc:'독도 강치·동경이 사례로 생태 파괴와 식민지 수탈을 연결하는 역사적 판단력',pct:35},
+          {r:3,name:'정체성과 상호 존중',desc:'토종 동물 복원 정책을 탐구하며 과거 잘못을 바로잡는 방안을 고민하는 역사의식',pct:20}
+        ]
+      }
+    ]
+  },
+
+  arts:{label:'예체능·교양',color:'var(--c7)',noComp:true,items:[
+    {tab:'사례 1',subject:'물리학1 (파동·음악)',type:'세부능력 및 특기사항',
+     text:`파동과 정보통신 단원에 관심이 많은 학생으로 정상파와 음악과 연결하여 학습하는 등 교과 간의 융합 능력이 탁월한 학생임. <span class="h1">음악 수행평가 후 조화로운 화음과 불협화음을 구분 짓는 요인에 대한 의문점을 해결하기 위해 '음악 본능(크리스토프 드뢰서)'의 느낌 챕터와 헬름홀츠의 이론을 참고하는 등 추가로 학습함. 수학1 시간에 배운 기본 개념을 적용해 진동수를 이용한 화음의 일반항을 수식으로 표현해보는 등 물리와 수학과 음악을 융합하여 이해함</span>. 단진자를 이용하여 중력가속도 측정 탐구 실험에서 주어진 과제에 추가로 <span class="h2">중심각을 변인으로 설정하여 실험을 스스로 계획 주도함. 상대오차 계산 후 중심각과 각운동이라는 두 가지 요인을 오차의 원인으로서 추론함. 적용한 주기 관련 수식이 중심각이 작은 경우에만 성립하는 점을 깨닫고 중심각이 큰 측정 방법에 대한 의문을 품고 선생님께 질문함</span>. <span class="h3">무한급수의 형태로 표현된다는 설명을 들은 후, 인터넷 동영상, 극좌표계 등을 스스로 학습 후 유도과정을 이해하려고 노력하는 모습에서 자기주도적 학습능력이 돋보임. 물리와 수학과 음악의 교과 간 융합을 통한 심미적 이해와 창의적 탐구가 탁월함</span>.`,
+     comps:[{r:1,name:'창의적 사고 역량',desc:'화음의 수학적 구조를 물리학으로 탐구하는 융합적 창의적 사고',pct:45},{r:2,name:'자기관리 역량',desc:'중심각 추가 실험을 자기주도적으로 설계하고 탐구하는 역량',pct:30},{r:3,name:'심미적 감성 역량',desc:'음악과 물리학을 연결하여 감성적으로 이해하고 탐구하는 심미적 태도',pct:25}]},
+    {tab:'사례 2',subject:'체육 (생체역학)',type:'세부능력 및 특기사항',
+     text:`평소 생체역학에 관심을 가지고 있으며 발의 구조 속 아치 구조가 중요한 기능을 수행하고 있음을 알게 되어 '발 속 아치 구조의 기능에 대한 분석'을 주제로 탐구 활동을 시작함. <span class="h1">사람의 발이 아치 구조를 띠고 있기 때문에 다른 동물들과 달리 직립 보행이 가능하며, 인간만이 발에 2개의 디딤 포인트를 지니고 있다는 사실을 파악함. 이를 통해 체중 분산과 충격 흡수의 원리를 물리적 관점에서 분석하는 활동을 진행함</span>. <span class="h2">점심시간에 운동을 하면 오후 수업에 집중이 더 잘 된다는 점에 착안하여 '체육 수업이 학업에 미치는 영향'이라는 자율 주제를 탐구하여 발표함. '운동화를 신은 뇌(존 레이터)'를 읽고 운동 후 기분이 좋아지는 이유를 신체적, 생리적으로 분석하여 추론하고 미국 고등학교에서 0교시 체육 수업 후 학업 능력이 향상된 사례를 구체적 수치로 설명함으로써 신뢰성을 높임</span>. <span class="h3">향후 스포츠 과학의 한 분야인 생체역학, 운동역학을 탐구해 보고 싶다는 계획을 발표하여 큰 박수를 받음. 체육과 뇌과학을 연결하는 탐구 태도가 탁월하며 운동의 신경가소성 효과에 대한 관심을 학업과 진로에 접목하는 통합적 사고가 돋보임</span>.`,
+     comps:[{r:1,name:'지식정보처리 역량',desc:'독서·실증 수치로 체육과 학업의 관계를 논리적으로 분석·발표',pct:40},{r:2,name:'창의적 사고 역량',desc:'발의 아치 구조를 생체역학으로 연결하는 독창적 탐구 사고',pct:35},{r:3,name:'심미적 감성 역량',desc:'운동과 뇌과학을 통합하여 체육의 새로운 의미를 발견하는 감수성',pct:25}]},
+    {tab:'사례 3',subject:'심리학(교양)',type:'세부능력 및 특기사항',
+     text:`'과학적인 방법으로 인간의 마음 읽기'라는 담론을 중심으로 인간의 심리에 대한 심화된 탐구의 기회를 가짐. <span class="h1">심리학의 신격화를 경계하며 프레이밍 효과가 행동에 개인의 성격과 같은 사람 변인을 고려하지 않았다는 한계를 도출하는 모습이 인상적이었음. 관심 연구 주제를 설정하여 '메시지 프레이밍과 콘텐츠 유형에 따른 청소년 자살 예방 캠페인 효과에 관한 연구'라는 선행 연구를 찾아보고 내용을 요약하여 발표함</span>. <span class="h2">손실·이익 메시지 프레이밍이 COVID-19 백신 접종 의향에 영향을 미치는지 알아보기 위해 가설을 세우고 고등학생 116명을 대상으로 인터넷 설문조사를 하여 독립 표본 t-test를 실시한 결과 메시지 프레이밍에 따른 집단 간 평균차이가 통계적으로 유의한 수준으로 나타나 가설을 채택함</span>. <span class="h3">어려운 개념에 대한 이해가 빠르며 새로운 학습과 배움에 두려움이 없음. 심리학적 연구 방법론을 고등학교 수준에서 직접 설계·실행하는 탁월한 역량이 돋보이며 항상 수업에 적극적으로 참여하는 바른 인성을 지닌 학생임</span>.`,
+     comps:[{r:1,name:'창의적 사고 역량',desc:'심리학 한계를 스스로 도출하고 독립적 연구를 설계하는 독창적 접근',pct:45},{r:2,name:'지식정보처리 역량',desc:'설문 설계·t-test 분석·결론 도출의 사회과학적 정보처리 역량',pct:35},{r:3,name:'자기관리 역량',desc:'새로운 통계 개념을 두려움 없이 습득·적용하는 자기주도 학습 태도',pct:20}]},
+    {tab:'사례 4',subject:'교육학(교양)',type:'세부능력 및 특기사항',
+     text:`한 줄로 정의하는 교육이란 질문에서 '사회인으로 만드는 과정'이라 정의하고 루소의 '에밀'을 분석해 교육철학을 정립하는 활동에서 에밀을 관통하는 '경험을 토대로 스스로 이성을 형성하는 것이 교육이다'란 의견에 공감하지만 <span class="h1">자율성만을 토대로 한 사회적 성장엔 한계가 있으며 현대사회의 빠른 변화 속에선 효용성이 떨어지는 방법이 될 수 있다는 우려를 표함. 칸트 교육 철학에 대해 탐색한 뒤 루소와 칸트의 주장을 비교하고 교육이 지닌 수단성에 동의하는 의견을 제시하는 등 교육의 본질에 대해 고심하는 모습이 인상적임</span>. 교육사상가 탐구활동에서 비고츠키를 선정해 근접발달영역, 비계, 언어 등의 핵심개념으로 게시물을 작성해 발표함. <span class="h2">시각화를 통해 청중의 이해를 돕는 설명 방식이 인상적이었으며 내용 전달에 급급하지 않고 비고츠키의 주장들은 학습 지원 과정에 대한 통찰이 돋보이며 교육심리 영역의 확장을 가능케했다는 평을 하는 등 사상 전반에 대한 깊은 이해를 보임</span>. <span class="h3">수업지도안 작성 및 수업 실연활동에서 수학 교과를 선정해 수학에 큰 관심이 없는 친구에게 마치 1타 인강 강사같은 수업으로 집중과 이해가 잘 되었다는 생생한 동료 평가를 받는 등 뛰어난 교수역량을 보임. 루소·칸트·비고츠키를 비교 분석하여 교육의 본질에 대한 자신만의 관점을 형성하는 심화 탐구 태도가 돋보임</span>.`,
+     comps:[{r:1,name:'창의적 사고 역량',desc:'루소·칸트·비고츠키를 비교 분석하여 교육 본질에 대한 독창적 관점을 형성',pct:45},{r:2,name:'지식정보처리 역량',desc:'교육 사상가의 핵심 개념을 시각화하여 체계적으로 정리하고 발표',pct:30},{r:3,name:'협력적 소통 역량',desc:'동료가 이해하기 쉬운 수업을 실연하며 뛰어난 교수 소통 역량을 발휘',pct:25}]},
+    {tab:'사례 5',subject:'정보(인공지능기초)',type:'세부능력 및 특기사항',
+     text:`논리적인 사고력이 우수하며 문제 해결을 위한 알고리즘을 잘 설계하고 문제 해결력이 뛰어남. SW 개발 프로젝트에서 파이썬으로 <span class="h1">'FFT를 활용한 음원 주파수 분석 프로그램'을 개발함. 수학적 사고와 적분 교과에서 푸리에 변환을 탐구한 경험을 토대로 음원의 주파수를 추출 및 편집하는 프로그램을 개발함. 음원 파일 데이터 추출, FFT 수행, 그래프를 통한 시각화를 위해 라이브러리를 능동적으로 학습하고 시간 단위 분석, 주파수 단위 분석, 주파수 편집 기능을 모듈화 함으로써 간결하고 가독성 높은 프로그램을 완성함</span>. <span class="h2">중첩 제어구조 처리가 논리적으로 잘 구현되었으며 시각화한 그래프 출력 등 편리한 사용자 인터페이스를 지향한 점이 돋보임</span>. <span class="h3">'쿨리-튜키 알고리즘 기반 FFT의 원리 분석 및 실제적 구현'에 관한 심화 탐구를 진행함. FFT의 유도 과정을 수학적으로 증명하고, 홀짝을 나눠 분할 정복 알고리즘을 사용하기 때문에 FFT가 DFT보다 더 짧은 시간 동안 동작할 수 있음을 밝힘. 이를 검증하기 위해 FFT를 직접 코딩하여 구현하고 DFT와의 실행시간을 비교하며 수학적 지식과 컴퓨팅 사고력을 융합하여 탐구를 확장시켜 나가는 자세가 우수함</span>.`,
+     comps:[{r:1,name:'창의적 사고 역량',desc:'수학적 푸리에 변환을 음원 분석 프로그램으로 창의적으로 구현',pct:40},{r:2,name:'지식정보처리 역량',desc:'모듈화·시각화를 통해 사용자 친화적 프로그램을 체계적으로 설계',pct:35},{r:3,name:'자기관리 역량',desc:'FFT 원리를 수학적으로 증명하고 직접 코딩으로 검증하는 자기주도 심화 학습',pct:25}]}
+  ]},
+  auto:{
+    label:'자율활동',color:'var(--c9a)',
+    items:[
+      {no:0,tab:'교과역량',subject:'',type:'',isComp:true},
+      {
+        no:1,tab:'사례 1',subject:'자율활동 (독거노인 봉사 연계)',type:'창의적 체험활동상황',
+        text:`학급 내 분리수거 도우미로 매일 아침 휴지통 주변을 청소하며 궂은 일도 앞장서서 희생하는 모습을 보임으로써 분리수거 문화를 정착하여 학급에 선한 영향력을 미침. <span class="h3" data-rank="3">독거노인 도시락 배달 봉사를 하던 중 노인분께서 백내장과 동맥 경화증 등 노화성 질환을 앓고 계심을 알게 됨</span>. 이후 노화로 발병하는 질병들의 원리에 대해 조사함. <span class="h1" data-rank="1">세포 노화가 기관의 노화로 이어지면서 퇴행성 질환까지 발병할 수 있음을 알고, 거동이 불편하셔서 주기적인 병원 방문이 어려우신 노인 분들의 상황을 고려하여 노화 질환들을 효과적으로 치료할 수 있는 새로운 치료법에 대해 탐구함. 조사 과정에서 체내 샤페론이 변성된 폴리펩타이드의 3차원 접힘 형태를 촉매하여 정확한 형태로 접히는 단백질 항상성 유지와 노화 과정에서의 단백질 응집 예방을 통한 세포 수명 연장을 수행한다는 것을 알아냄. 샤페론과 노화된 단백질을 분해하여 세포의 항상성을 유지하는 자가포식 시스템 간의 커뮤니케이션을 활성화하는 약물 치료법이 세포 노화로 인한 질병의 치료에 도움을 줄 것이라 주장함</span>. <span class="h2" data-rank="2">학술자료를 탐독하고 샤페론 매개 자가포식이 알파시누클레인 분해를 촉진한다는 실험 데이터를 근거로 자신의 치료법의 효용성을 검증함</span>.`,
+        comps:[
+          {r:1,name:'지식정보처리 역량',desc:'노화 메커니즘 학술자료를 탐독하여 약물 치료법의 효용성을 논리적으로 검증',pct:45},
+          {r:2,name:'창의적 사고 역량',desc:'봉사 경험에서 의학적 탐구 주제를 도출하고 치료법 아이디어를 독창적으로 제안',pct:30},
+          {r:3,name:'공동체 역량',desc:'봉사 활동에서 노인 건강 문제를 인식하고 탐구로 연결하는 공동체 참여 의식',pct:25}
+        ]
+      },
+      {
+        no:2,tab:'사례 2',subject:'자율활동 (미세플라스틱 탐구)',type:'창의적 체험활동상황',
+        text:`미세플라스틱 관련 칼럼을 읽고 미세플라스틱의 현황과 위험성, 해결방안을 탐구함. <span class="h1" data-rank="1">2㎛ 이하의 미세플라스틱이 혈관과 뇌 장벽을 통과해 뇌의 면역기능을 담당하는 미세아교세포의 세포증식능력을 저하시키고 트로이목마 효과를 통해 세포 속으로 유해물질이나 병원균을 들여보내 건강을 위협함을 알게 됨</span>. 이의 해결책으로 <span class="h2" data-rank="2">정부의 적극적인 생분해성 플라스틱 개발 지원과 바이오 인증제 도입을 제언함. 이후 선진국에서 생산한 플라스틱 폐기물이 개발도상국으로 팔리고 있다는 기사를 찾아 읽고 미세플라스틱이 UN 회의의 안건임을 가정하고 인도네시아의 입장을 가상 시나리오로 작성해 봄. 폐기물의 국가간 이동을 규제한 바젤협약을 보완해 선진국이 개발도상국에게 플라스틱 폐기물을 떠넘기지 않고 자율적 플라스틱 처리 체계를 정립하게끔 해야 함을 주장함</span>. <span class="h3" data-rank="3">환경 문제는 전 세계가 연대 의식을 갖고 해결해야 한다는 최종 제언이 강력하였으며, 향후 생분해성 신소재 탐구를 계획하며 미래 생태주의 패러다임으로의 전환을 위한 방안을 찾아가겠다는 소명의식을 함양함</span>.`,
+        comps:[
+          {r:1,name:'지식정보처리 역량',desc:'미세플라스틱이 신체에 미치는 과학적 기전을 자료 분석으로 체계적으로 탐구',pct:40},
+          {r:2,name:'창의적 사고 역량',desc:'UN 가상 시나리오 작성으로 국제 환경 문제를 창의적 관점에서 분석하고 제안',pct:35},
+          {r:3,name:'공동체 역량',desc:'글로벌 연대 의식을 바탕으로 생분해성 신소재 탐구 계획을 세우는 소명의식',pct:25}
+        ]
+      },
+      {
+        no:3,tab:'사례 3',subject:'자율활동 (체육과 학업)',type:'창의적 체험활동상황',
+        text:`점심시간에 운동을 하면 오후 수업에 집중이 더 잘 된다는 점에 착안하여 '체육 수업이 학업에 미치는 영향'이라는 자율 주제를 탐구하여 발표함. <span class="h1" data-rank="1">주제 탐구를 위해 '운동화를 신은 뇌(존 레이터)'를 읽고 운동 후 기분이 좋아지는 이유를 신체적, 생리적으로 분석하여 추론함. 또 미국 고등학교에서 0교시 체육 수업을 한 후 학업 능력이 향상된 사례를 구체적 수치를 들어서 설명함으로써 발표 내용의 신뢰성을 높임</span>. 탐구 과정을 통해 체육 수업의 긍정적 효과를 알게 되었다면서 체육 수업의 중요성을 강조함. <span class="h2" data-rank="2">추후 활동으로 평소 예비 체육교사로서 관심 있게 바라봐 왔던 주제인 '체육 수업이 학생의 심리적 욕구 변화에 미치는 영향'과 '효과적인 비대면 체육 수업 방안'에 대해 깊이 고민한 탐구 결과를 통합해 심화 탐구 보고서를 우수하게 작성함</span>. <span class="h3" data-rank="3">진로(체육교사)와 연계하여 자신의 관심을 공동체 교육 개선으로 확장하는 실천 의지가 돋보임</span>.`,
+        comps:[
+          {r:1,name:'지식정보처리 역량',desc:'독서·실증 사례 수치를 활용하여 체육과 학업의 관계를 논리적으로 분석·발표',pct:45},
+          {r:2,name:'자기관리 역량',desc:'심화 탐구 보고서로 진로(체육교사) 관련 주제를 자기주도적으로 심화하는 역량',pct:35},
+          {r:3,name:'공동체 역량',desc:'진로를 공동체 교육 개선과 연결하며 사회 기여 의지를 보여주는 소명의식',pct:20}
+        ]
+      },
+    {tab:'사례 4',subject:'자율활동 (안락사·인공뼈)',type:'창의적 체험활동상황',
+     text:`자율탐구 주제로 안락사의 윤리적 쟁점을 탐구하며 의사조력자살이 고통의 회피를 목적으로 한다는 점에서 인격을 수단화하고 있음을 지적하며 도덕법칙에 위배됨을 설명함. <span class="h1">사회적 관점에서 '의사조력자살'의 합법화는 죽음에 대한 사회규범의 변화를 초래할 수 있으므로 신중해야 한다고 역설함. 나아가 안락사를 법제화한 국가들의 지침에 대해 알아본 후 자율성과 공동선을 모두 고려한 안락사 허용조건을 철학적 논거와 함께 체계적으로 제시하는 모습에서 융합적 사고력이 돋보였음</span>. '사회적 약자를 위한 아이디어' 공모전을 계획하여 새로운 트러스 구조를 이용한 인공뼈 디자인을 주제로 탐구함. 노인 비율이 급속하게 증가하는 현상황에서 노인 사망의 원인이 되는 낙상 문제를 해결하기 위한 방법을 모색하는 과정에서 <span class="h2">수학시간에 배운 프랙탈 구조와 연계하여 프랙탈 트러스 구조로 설계된 인공뼈를 디자인하게 되었다고 밝힘. 관련 논문을 참고하여 비밀도라는 개념을 바탕으로 다양한 프랙탈 구조의 강도를 측정함</span>. <span class="h3">비교 실험을 통한 최적의 구조를 찾아 설명한 점에서 분석적, 비판적 사고력이 돋보였음. 의학 윤리 탐구와 공학 설계를 자율활동 내에서 연결하는 통합적 탐구 역량이 탁월함</span>.`,
+     comps:[{r:1,name:'창의적 사고 역량',desc:'프랙탈 구조를 인공뼈 설계에 응용하는 독창적 아이디어 제안',pct:40},{r:2,name:'지식정보처리 역량',desc:'논문 탐독으로 비밀도 개념을 이해하고 실험으로 최적 구조를 도출',pct:35},{r:3,name:'공동체 역량',desc:'노인 낙상 문제를 의학-공학 융합으로 해결하려는 공동체 기여 의식',pct:25}]},
+    {tab:'사례 5',subject:'자율활동 (등굣길 안전매핑)',type:'창의적 체험활동상황',
+     text:`등굣길 안전 매핑 팀장으로 데이터 수집 후 시계열에 따른 주기성과 보행 동선 82.3%가 인도/차도 형태가 혼재됨을 확인함. <span class="h1">차도 이동 시 위험성을 재고하고자 학생 동선 분석과 원격 조종 신호등 설치를 제시하고 PMI 기법을 적용하여 분석함. 요일별 유연성 적용을 위해 리모컨 조절 기능을 추가하고 신호등을 직접 제작함. 라이다를 활용하여 학생들의 개별 궤적 800개를 수집하고 ANOVA 분석으로 연령, 시간별 보행자 특성을 분석하여 p=0.02 유의성을 확인함</span>. <span class="h2">동선의 부호화 기준 각도 오판 문제를 인식, 코드 수정 후 DNN 모델을 적용하여 88.9% 정확도 및 loss=0.15임을 확인함. 신호등 작동 알고리즘에서 ARIMA를 최종 모델로 선정하여 보행자 밀집도의 주기성을 시각화하고 병목 예측 가능한 신호등을 구축함</span>. <span class="h3">이후 라이다 재분석 결과 혼잡도가 65.3% 감소한 것을 확인함. 결과물을 토대로 중-고교 연계 활동에서 학교 안전과 창업가 정신을 융합하여 교육 프로그램을 운영하는 등 공동체적 가치를 실현하는 학생임</span>.`,
+     comps:[{r:1,name:'지식정보처리 역량',desc:'라이다·ANOVA·DNN·ARIMA를 활용한 체계적 데이터 수집·분석·모델링 역량',pct:50},{r:2,name:'창의적 사고 역량',desc:'PMI 기법으로 문제를 분석하고 ARIMA 기반 스마트 신호등을 독창적으로 설계',pct:30},{r:3,name:'공동체 역량',desc:'등굣길 안전을 데이터로 해결하고 중-고교 연계 교육 프로그램으로 확장',pct:20}]}
+    ]
+  },
+
+  career:{
+    label:'진로활동',color:'var(--c9b)',
+    items:[
+      {no:0,tab:'교과역량',subject:'',type:'',isComp:true},
+      {
+        no:1,tab:'사례 1',subject:'진로활동 (BBI 탐구)',type:'창의적 체험활동상황',
+        text:`수업량유연화 기간에 평소 관심이 있던 BCI를 넘어 <span class="h1" data-rank="1">BBI(brain-brain-interface)를 구현할 수 있을까라는 호기심으로 탐구를 진행함. 국내 자료가 거의 없어 해외 최신 학술 자료를 직접 찾는 열의를 보임. 뇌 신호를 측정하는 분야에 비해 수신자 뇌에 신호를 전달하는 기술 발전이 느린 것에 흥미를 느껴 탐구를 시작함. 사전 조사로 기존 뇌자극술에 활용되는 에너지원과 적용 질환에 대해 알아봄. '비침습적 뇌신경 자극을 통한 인체 촉각생성 유효성 검증 연구'와 같은 학술 자료를 통해 뇌 자극술 임상 동향과 전자약 적용 사례를 정리함</span>. <span class="h2" data-rank="2">동아리에 있는 소형 tDCS 장비를 이용하여 두통, 주의 집중에 도움이 된다고 알려진 뇌부위를 찾아 효과가 있는지 직접 실험하는 적극적인 자세를 보임</span>. <span class="h3" data-rank="3">최신 연구된 BBI 기술의 한계에 대해 고민하고 연구하여 정밀한 신호 전달을 위한 방안으로 광유전학 사용을 제안하는 창의성을 보임</span>.. 또한 뇌를 연구하기 위한 임상 동물 실험은 윤리적 문제와 부정확성으로 어려움이 있는데 대체 방안으로 <span class="h3" data-rank="3">줄기세포를 뭉쳐 뇌 조직을 모사한 뇌 오가노이드 모델과 뇌 생체 조직 칩 모델을 이용할 수 있다는 것에 흥미를 느껴 관련 학술 자료와 연구 결과를 찾아보고 이를 글로 정리함</span>.`,
+        comps:[
+          {r:1,name:'지식정보처리 역량',desc:'국내 자료 부재 상황에서 해외 최신 학술 자료를 독립적으로 탐색·분석하는 역량',pct:40},
+          {r:2,name:'자기관리 역량',desc:'tDCS 장비로 직접 실험하는 자기주도적 진로 탐구 태도',pct:35},
+          {r:3,name:'창의적 사고 역량',desc:'BBI 기술의 한계를 광유전학으로 해결하는 독창적 발상과 제안',pct:25}
+        ]
+      },
+      {
+        no:2,tab:'사례 2',subject:'진로활동 (항산화제 탐구)',type:'창의적 체험활동상황',
+        text:`교내 드림코워크 활동에서 의료 계열을 희망하는 학생들과 모둠을 이루고 조장을 맡아 진로 탐구 활동을 주도해 나감. '노화도 질병으로 인식하는 시대'라는 기사를 읽고 노화 방지에 도움을 주는 항산화제를 주제로 활동을 시작함. <span class="h1" data-rank="1">라디칼 소거능을 계산하는 심화 탐구로 인간 세포를 활용한 WST-8 Assay 실험까지 진행함. 앞선 실험에서 도출한 라디컬 소거능이 유사한 값을 보인 반면 두 번째 실험에서 인간세포 생존율이 다른 항산화제들에 비해 비타민C만 약 20배에 달하자 실험 결과에 대한 의문을 가짐</span>. '이왕재 교수의 비타민C 이야기'를 읽고 비타민C는 활성산소를 환원시킨 후 산화되어 라디칼로 변화되는데 이 형태에서 독성을 나타내지 않는 특징이 원인이라 예상하고 <span class="h2" data-rank="2">면역학 교수님에게 이메일을 통해 추론의 타당성을 검증받음</span>. <span class="h3" data-rank="3">연쇄적 네트워크로 활성 산소 제거가 이뤄짐을 통해 소거능이 높은 한가지 항산화제만 복용하는 것보다 여러 종류의 항산화제를 섭취하는 것이 인체에 이롭다는 결론을 내림. 실험 과정에서 생긴 의문을 자기주도적으로 해결하며 전문적 지식을 요구하는 활동임에도 간학문적 역량을 발휘하며 탐구하는 모습이 인상적임</span>.`,
+        comps:[
+          {r:1,name:'창의적 사고 역량',desc:'예상치 못한 실험 결과에서 새로운 탐구 질문을 생성하고 심화하는 창의적 탐구 사고',pct:40},
+          {r:2,name:'지식정보처리 역량',desc:'전문가 이메일 교류로 추론의 타당성을 검증하는 학문적 정보 활용 역량',pct:35},
+          {r:3,name:'자기관리 역량',desc:'모둠 조장으로서 전 탐구 과정을 자기주도적으로 이끌며 결론까지 도출',pct:25}
+        ]
+      },
+      {
+        no:3,tab:'사례 3',subject:'진로활동 (고혈압·전자간증)',type:'창의적 체험활동상황',
+        text:`평소 의료통계를 찾아보며 의학과 사회의 관계 속에서 개선되어야 하는 점을 적극적으로 찾으며 WHO의 세계질병부담연구에서 사망 위험요인의 기여도 중 1위가 고혈압임을 확인하고 이에 대한 문제의식을 가지고 추가적으로 조사를 진행함. <span class="h1" data-rank="1">이 과정에서 고혈압에서 진행되는 질병들 중 모 전자간증을 접하며 임산부뿐만 아니라 태아의 생명까지 위협할 수 있는 질환임을 확인함. 임산부가 임신 기간 중 고혈압 등의 증상을 스스로 발견하기 힘들다는 점과 임산부의 잦은 이동이 불편한 점을 고려하여 임산부의 혈압을 가정에서 측정한 후 병원으로 데이터를 보내 자간전증의 위험성을 의사가 판단하도록 하는 방법을 이전에 탐구했던 광혈류측정센서를 활용하여 친구와 함께 설계해 봄</span>. <span class="h2" data-rank="2">두 학술자료를 탐독하며 수축기 혈압이 맥파전달시간과 비례함과 이완기 혈압이 수축기 혈압과 비례하지만 광혈류측정센서와 심전도 센서의 위상차와는 반비례함을 확인함</span>. <span class="h3" data-rank="3">(*전자간증은 임신 20주 이후에 발생하는 고혈압성 질환으로 흔히 '임신중독증' 혹은 자간전증이라고도 불림.) 이전 탐구 활동의 성과를 진로(의사) 관련 실용 기기 설계로 확장하는 연계성이 돋보임</span>.`,
+        comps:[
+          {r:1,name:'창의적 사고 역량',desc:'광혈류측정센서를 전자간증 가정 모니터링 시스템에 창의적으로 응용 설계',pct:40},
+          {r:2,name:'지식정보처리 역량',desc:'수축기·이완기 혈압과 센서 위상차의 관계를 학술자료로 분석하는 정보 처리 역량',pct:35},
+          {r:3,name:'자기관리 역량',desc:'이전 탐구(광혈류측정)를 진로 관련 실용 기기 설계로 발전시키는 지속적 자기계발',pct:25}
+        ]
+      },
+    {tab:'사례 4',subject:'진로활동 (개 후각·치매)',type:'창의적 체험활동상황',
+     text:`수업량 유연화 주간에 '개가 주인의 간질 발작을 발생 전에 미리 알아차렸다'라는 뉴스기사를 접하고 호기심을 느껴 탐구하던 중 <span class="h1">개의 후각을 이용하여 암세포 속 비정상 대사 산물을 감지하도록 하는 연구가 진행되고 있다는 것을 알게 됨. 종양 대사에서 발생하는 mhc, 체내 유기 휘발성 물질의 구성이 정상 대사와 달라 냄새 분자 또한 다르다는 것을 알게 되었고 이를 개가 감지할 수 있도록 훈련시킨다는 내용을 탐구하고 비슷한 원리로 치매의 조기 진단에도 사용될 수 있을 것이라 생각함</span>. <span class="h2">치매 원인으로 지목되는 타우 단백질과 아밀로이드 베타 단백질로 인해 야기되는 신경 염증이 발생하게 되는데 염증 과정 속 여러 화학 물질 중 개가 후각으로 감지할 수 있는 비휘발성 또는 휘발성 물질이 있다면 암 조기진단과 마찬가지로 개를 치매 진단에 이용할 수 있을 것이라는 가능성을 제시함</span>. <span class="h3">치매 진단법 중 개를 이용한 치매진단법이 현실화된다면 치매 진단에 대한 환자의 거부감을 줄일 수 있을 것이라 주장함. 또한 치매 진단을 위해 자신의 관심분야를 신경계에 국한시킬 것이 아니라 생물학적, 화학적 분야의 이슈로도 관심을 확대하겠다고 다짐함</span>.`,
+     comps:[{r:1,name:'창의적 사고 역량',desc:'개의 후각 탐지 원리를 치매 진단에 창의적으로 연결하는 독창적 탐구 발상',pct:45},{r:2,name:'지식정보처리 역량',desc:'타우·아밀로이드 베타 관련 학술 정보를 탐색하여 논리적 가설을 구성',pct:35},{r:3,name:'자기관리 역량',desc:'관심 분야를 신경계에서 생물·화학으로 확장하겠다는 자기주도 학습 의지',pct:20}]},
+    {tab:'사례 5',subject:'진로활동 (해피 암 치료센터)',type:'창의적 체험활동상황',
+     text:`2학년 때 백혈병에 대해 탐구하며 암 치료뿐만 아니라 우울증에 대한 치료와 관리가 필요하다고 깨달은 것을 계기로 <span class="h1">암 환자들이 행복하게 치료받을 수 있는 양한방 협진 시스템을 구상해 보겠다는 포부를 가지고 진로 융합 탐구 프로젝트의 주제로 '해피 암 치료센터'를 선택함. 수술 후유증 관리와 환자의 심리 안정에 초점을 맞추어 침 치료와 뜸 치료, 효소욕 요법 등을 주된 후유증 치료 방법으로 제시하였으며 면역력 증진을 위하여 인프레크 요법을 사용한 체계적인 생활관리 시스템을 구상함</span>. <span class="h2">다른 의학 계열을 희망하는 모둠원들과 함께 작업치료, 미술치료, 연극치료를 동반한 심리 안정 프로그램을 구상한 것이 인상적임. 프로젝트 리더로서 '해피 암 치료센터'의 뼈대를 만들고 특유의 유머와 에너지로 소극적인 모둠원들을 격려해 모두가 적극적으로 참여한 암 치료센터 홍보 영상을 제작함</span>. <span class="h3">친구들로부터 암 치료 외에도 환자의 정서적 측면을 보살피는 것이 중요함을 깨달을 수 있었다는 평가를 받았으며, 암 치료를 넘어 치료 과정 중 그리고 이후의 환자 행복까지 고려하는 양한방 통합 치료 환경이 많아져야 한다는 소감을 남김</span>.`,
+     comps:[{r:1,name:'창의적 사고 역량',desc:'양한방 협진 시스템과 심리치료 프로그램을 독창적으로 설계하는 역량',pct:45},{r:2,name:'협력적 소통 역량',desc:'모둠원들을 격려하고 이끌어 홍보 영상까지 완성하는 리더십과 협업',pct:35},{r:3,name:'심미적 감성 역량',desc:'환자의 정서와 행복을 치료의 핵심 가치로 인식하는 인간 중심 감수성',pct:20}]}
+    ]
+  },
+
+  club:{
+    label:'동아리활동',color:'var(--c9c)',
+    items:[
+      {no:0,tab:'교과역량',subject:'',type:'',isComp:true},
+      {
+        no:1,tab:'사례 1',subject:'동아리활동 (손 소독제 실험)',type:'창의적 체험활동상황',
+        text:`<span class="h1" data-rank="1">'손 소독제 성분별 항균 효과 비교'를 주제로 탐구활동을 진행함. 손 소독제의 성분들 중 글리세린과 에탄올의 함량에 주목하여 두 성분을 변인으로 잡은 뒤 글리세린과 에탄올 농도가 각기 다른 손 소독제, 그리고 한천 배지(핸드 플레이트)를 준비하여 실험을 진행하였고 그 결과 에탄올은 70%일 때 글리세린 농도는 30%일 때가 가장 세균 배양이 적음을 확인함</span>. <span class="h2" data-rank="2">이렇게 알아낸 농도를 이용하여 직접 간이 손 소독제를 만들고 이를 자체 제작한 포스터와 함께 학교 곳곳에 배치하여 학생들이 이용할 수 있도록 하는 캠페인도 진행함</span>. 이후 신경계 질환과 유전 단원 수업 후 정신질환은 유전되는가를 주제로 탐구함. DNA 염기서열 자체는 변하지 않으면서 특정 유전자의 발현에 관여하는 발현 스위치가 생겨 표현형이 달라져 자손에게 유전되는 후성 유전에 대해 알게 됨. 분자 유전학적 학술자료들을 분석하고 정리하여 조현병을 비롯한 여러 정신질환들이 환경과 유전의 영향을 모두 받는다는 결론을 내림. <span class="h3" data-rank="3">중증 정신질환 치료를 위해 국가책임제를 도입하고 정신 응급과 급성기 치료를 필수 의료로 지원하며 지역사회의 치료와 재활에 대한 적극적인 투자가 필요하다고 주장함. 조현병의 조기발견의 중요성을 역설하면서 10대들도 쉽게 할 수 있는 조현병 자가검진 설문을 만들고 싶다는 포부를 밝힘</span>.`,
+        comps:[
+          {r:1,name:'창의적 사고 역량',desc:'변인을 설정하고 최적 농도를 도출하는 체계적 실험 설계와 창의적 탐구 접근',pct:40},
+          {r:2,name:'공동체 역량',desc:'실험 결과를 직접 소독제와 캠페인으로 만들어 학교 보건 개선에 기여',pct:35},
+          {r:3,name:'협력적 소통 역량',desc:'실험 결과를 포스터로 시각화하여 학교 구성원과 공유하는 과학 소통 역량',pct:25}
+        ]
+      },
+      {
+        no:2,tab:'사례 2',subject:'동아리활동 (뇌과학 스터디)',type:'창의적 체험활동상황',
+        text:`전문서적 'Neuroscience(Dale Purves 외)'를 탐독하는 스터디를 구성하고 읽기 자료를 제작하여 학우들과 공유함. <span class="h1" data-rank="1">공간기억과 장기기억이 저장되는 해마에 주목해 그 역할과 뇌 질환의 관계에 대해 탐구함. '월간 뇌과학' 잡지 간행을 제안하고 편집장을 맡아 지식 나눔을 실천함. 해마치상회에서 성체 신경생성이 일어남을 인지하고 학술자료를 참고하여 신경줄기세포에서부터 해마 전구세포를 거쳐 뉴런으로 분화되는 과정을 알기 쉽게 정리함</span>. <span class="h2" data-rank="2">알츠하이머병의 병태생리학적 특징인 성체 신경생성의 감소와 신경세포와 시냅스의 손실을 완화하기 위한 방법으로 뇌유래신경성장인자(BDNF)를 소개하는 글을 작성함. 'Kandel 신경과학의 원리'를 발췌독하며 미토콘드리아 기능장애로 인하여 사이토크롬C가 방출되어 캐스페이즈-9로 이어지는 세포자멸사 경로를 TrkB 수용체와 BDNF의 결합으로 억제하는 원리를 탐구함</span>. <span class="h3" data-rank="3">이후 PCR과 젤 전기영동을 활용해 구강상피세포의 mtDNA를 분석하는 실험을 조원들과 수행함. 퇴행성 뇌질환과 미토콘드리아의 관계를 mtDNA의 빠른 변이속도와 관련해 고찰하며 미토콘드리아 기능에 관여하는 단백질을 암호화하는 mtDNA에 발생한 변이를 교정하는 기술을 통한 치료의 가능성을 전망함</span>.`,
+        comps:[
+          {r:1,name:'협력적 소통 역량',desc:'스터디 구성·잡지 간행으로 학우들과 뇌과학 지식을 공유하는 협력적 리더십',pct:40},
+          {r:2,name:'지식정보처리 역량',desc:'대학원 수준 교재를 탐독하여 BDNF·세포자멸사 경로를 체계적으로 분석',pct:35},
+          {r:3,name:'창의적 사고 역량',desc:'mtDNA 변이 교정 기술을 치매 치료 가능성으로 연결하는 창의적 과학적 전망',pct:25}
+        ]
+      },
+      {
+        no:3,tab:'사례 3',subject:'동아리활동 (의수 제작)',type:'창의적 체험활동상황',
+        text:`절단장애인의 불편에 대한 기사를 읽고 '현대사회의 인권'이라는 대주제를 선정해 '절단장애인의 심리적 고통과 미래형 근전도 의수 개발에 대한 탐구'라는 탐구 주제를 선정하여 1년 동안 탐구활동을 진행함. <span class="h1" data-rank="1">절단장애인의 고통을 이해하고 실제 전문의를 인터뷰해 그들의 정신적 어려움과 치료, 환상통을 자세히 알아보려 한 점이 돋보임. 의수 제작 이전에 교과지식을 바탕으로 근전도 신호와 근육의 구조에 대해 학습하고 근전도 신호 측정 활동을 함. '바이오닉맨(임창환)'을 읽고 의수의 종류와 원리를 알고 직접 이해하기 위해 아두이노와 근전도 센서를 사용해 다섯손가락 간이 근전도 의수를 구현함</span>. <span class="h2" data-rank="2">코딩 경험이 전무한 조원들이 있어 시행착오가 있었음에도 조원들을 이끌고 알려주며 프로그래밍을 성공해내는 도전정신이 인상적임</span>. <span class="h3" data-rank="3">절단장애인을 위한 심리적 지원과 심리 활용 의수디자인 등 의수의 발전을 위해 더 노력하기를 원함. 이후 3학년 동아리에서 근육 중복도의 수학적 이해를 탐구하며 1·2학년 의수 제작 탐구를 수학적 모델링으로 심화 연계하는 지속적 성장이 돋보임</span>.`,
+        comps:[
+          {r:1,name:'창의적 사고 역량',desc:'근전도 신호를 아두이노로 구현하는 독창적 의수 설계와 실제 제작 역량',pct:40},
+          {r:2,name:'협력적 소통 역량',desc:'코딩 미경험 조원들을 이끌고 함께 프로그래밍을 성공시키는 리더십과 협업',pct:35},
+          {r:3,name:'공동체 역량',desc:'장애인 인권 문제를 탐구로 연결하고 지속적 심화를 통해 사회 기여를 지향',pct:25}
+        ]
+      },
+    {tab:'사례 4',subject:'동아리활동 (장기기억 실험)',type:'창의적 체험활동상황',
+     text:`브래드포드 단백질 정량 실험을 통해 치매 환자들에게 공통으로 발생하는 아밀로이드 베타 단백질과 타우 단백질을 측정해 치매를 조기에 진단할 수 있음을 알고 이를 확장하여 치매 조기 치료에도 관심을 가지게 됨. <span class="h1">주요 치매 증상인 기억력 손상을 환자들이 두려워한다는 것에 공감하여 기억력 감퇴 현상을 늦출 수 있는 방법에 대해 고민함. 단기 기억이 장기 기억으로 전환되는 생물학적 기전에 대해 탐구해 장기 기억의 형성에는 반복적인 자극을 통해 CPEB 활성을 높여 시냅스 돌기 형성을 강화하는 것이 중요함을 알게 됨</span>. <span class="h2">장기 기억에 효율적인 암기법을 알아보기 위해 일반적인 암기를 한 학생과 냄새 또는 사물 연관 암기법을 사용한 학생을 각각 대조군과 실험군으로 설정하여 암기력 측정 실험을 수행함. 실험군의 유의미한 암기력 향상을 확인하고 외부 자극이 장기 기억 메커니즘을 촉진한다는 결론을 내림</span>. <span class="h3">치매 환자들이 주변인의 향수 냄새 또는 주변장소 등을 기억과 연관짓는다면 인위적으로 CPEB 활성을 유도해 기억력 감퇴 증상을 완화할 것이라 함. 또한 치매 조기 치료 과정에서 위와 같은 처방을 내리면 약물 치료의 부작용과 환자의 거부감을 줄일 수 있는 효과도 기대할 수 있다함</span>.`,
+     comps:[{r:1,name:'창의적 사고 역량',desc:'CPEB 활성과 냄새·사물 연관 암기법을 치매 치료에 연결하는 창의적 발상',pct:40},{r:2,name:'지식정보처리 역량',desc:'대조군-실험군 설계로 장기 기억 메커니즘을 실증적으로 탐구하는 역량',pct:35},{r:3,name:'심미적 감성 역량',desc:'환자의 기억 손상에 공감하며 치료의 인간적 측면을 고려하는 감수성',pct:25}]},
+    {tab:'사례 5',subject:'동아리활동 (정책동아리)',type:'창의적 체험활동상황',
+     text:`정신건강에 대한 의료비 조세지원 정책을 제안함. <span class="h1">소득세법과 부가가치세법을 제시하며 의료비 세액공제가 엄격한 진료 행위만 대상으로 하기에 정신건강 예방 활동에는 조세혜택이 배제된다고 함. 이에 정신건강 예방에 대한 세액공제 확대 및 부가가치세 면세를 주장하고, 정신건강 진료비에 대한 50% 세액공제 신설을 제안함. 세액공제 신설이 적극적 진료를 촉구해 정신건강 비용을 약 1% 인하할 것이라 가정하여 매년 기대되는 GDP 증가분(약 6000억원)을 계산함</span>. <span class="h2">한국은행 경제통계를 참고해 GDP 증가분에 생산 유발계수, 취업유발계수를 적용하고 각 수치를 산출하여 정책효과를 입증함. 한국기업의 할랄 시장 진출 방안에 대해 발표함. 할랄 시장 확대 원인으로 무슬림 인구 증가를 언급하며 특히 청년 수가 증가하여 2030년엔 무슬림이 세계 청년층의 29%를 차지할 것이라 함</span>. 기존 연구의 계층화 분석(AHP) 결과를 활용해 할랄 시장 활성화 요인인 정부, 전략, 현지시장, 인프라, 예산 중 정부 요인이 0.345로 가장 중요함을 밝힘. <span class="h3">수출지원 제도 마련을 주장하면서 할랄 인증을 획득해 소비자의 신뢰를 얻은 까르푸 매장 사례를 근거로 정부의 할랄 인증 비용 일부 지원을 제안함. 실증 데이터와 해외 사례를 조합하여 정책 논리를 완성하는 탁월한 정책 분석 역량이 돋보임</span>.`,
+     comps:[{r:1,name:'지식정보처리 역량',desc:'세법·경제통계·AHP 분석을 활용하여 정책 효과를 수치로 입증하는 역량',pct:50},{r:2,name:'창의적 사고 역량',desc:'정신건강 조세지원이라는 새로운 정책 아이디어를 경제 논리로 설계',pct:30},{r:3,name:'협력적 소통 역량',desc:'할랄 시장 사례를 국제적 관점에서 분석하여 동아리 구성원과 공유',pct:20}]}
+    ]
+  }
+};
+
+// ═══════════════════════════════════════════
+
+
+// STATE
+let cat='korean', idx=0;
+
+function sw(c,btn){
+  cat=c; idx=0;
+  document.querySelectorAll('.nbtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+function gEx(i){idx=i;render();}
+
+function render(){
+  const catData=DATA[cat];
+  const compData=COMPS[cat];
+  const item=catData.items[idx];
+  const isActs=catData.noComp;
+
+  const tabsHtml=catData.items.map((it,i)=>
+    `<button class="etab${i===idx?' active':''}" style="--cc:${catData.color}" onclick="gEx(${i})">${it.tab}</button>`
+  ).join('');
+
+  let bodyHtml='';
+  if(item.isComp){
+    const chipColors=['#c4930a','#1a7a47','#8b2252','#c45208','#1a6fa3','#6a3e15','#7a2a8a','#2d6060'];
+    const chips=compData.items.map((c,i)=>`
+      <div class="chip" style="border-left-color:${chipColors[i]||'#666'}">
+        <div class="chip-num" style="color:${chipColors[i]||'#666'}">역량 ${String(i+1).padStart(2,'0')}</div>
+        <div class="chip-name" style="color:${chipColors[i]||'#666'}">${c.name}</div>
+        <div class="chip-desc">${c.desc}</div>
+      </div>`).join('');
+    bodyHtml=`
+      <div class="comp-intro fade-in">
+        <div class="ci-title">${compData.label}</div>
+        <div class="ci-sub">2022 개정 교육과정에 명시된 교과 역량입니다. 아래 역량들이 학생부 기록에 어떻게 드러나는지 사례에서 확인하세요.</div>
+        <div class="comp-grid">${chips}</div>
+        <div class="src-note">📌 출처: 2022 개정 교육과정 각 교과 교육과정 총론 및 교과별 성격·목표 항목<br>지극히 개인적인 의견이며, 고민하는 모두가 정답입니다.</div>
+      </div>`;
+  } else {
+    const comps=item.comps||[];
+    const analysisRows=comps.map(c=>`
+      <div class="ra-row" onclick="jumpTo(${c.r})">
+        <span class="ra-bdg rb${c.r}">${c.r}위 역량</span>
+        <div class="ra-info">
+          <div class="ra-top">
+            <span class="ra-name rn${c.r}">${c.name}</span>
+            <span class="ra-pct">${c.pct}%</span>
+          </div>
+          <div class="ra-bar"><div class="ra-fill rf${c.r}" style="width:${c.pct}%"></div></div>
+          <div class="ra-desc">${c.desc}</div>
+        </div>
+      </div>`).join('');
+
+    bodyHtml=`
+      <div class="rec fade-in">
+        <div class="rec-meta">
+          <span class="m-sub" style="background:${catData.color}">${item.subject||''}</span>
+          <span class="m-type">${item.type||''}</span>
+        </div>
+        <div class="rec-body" id="rec-body">${item.text||''}</div>
+        ${comps.length?`
+        <div class="rec-analysis">
+          <div class="ra-hdr">🎯 교과역량 분석</div>
+          <div class="ra-rows">${analysisRows}</div>
+          <div class="ra-hint">👆 역량 카드를 클릭하면 해당 서술로 이동합니다</div>
+        </div>`:''}
+      </div>`;
+  }
+
+  document.getElementById('mc').innerHTML=`
+    <div class="cat-hdr">
+      <span class="cat-badge" style="background:${catData.color}">${catData.label}</span>
+      <span class="cat-name">${catData.label} 기록 사례</span>
+    </div>
+    <div class="etabs" style="--cc:${catData.color}">${tabsHtml}</div>
+    ${bodyHtml}
+  `;
+}
+
+function jumpTo(rank){
+  const spans=document.querySelectorAll('.h'+rank);
+  if(!spans.length) return;
+  spans[0].scrollIntoView({behavior:'smooth',block:'center'});
+  document.querySelectorAll('.h1,.h2,.h3').forEach(s=>s.classList.remove('glow'));
+  spans.forEach(s=>{
+    s.classList.add('glow');
+    setTimeout(()=>s.classList.remove('glow'),2000);
+  });
+}
+
+render();
+
+</script>
+</body>
+</html>
